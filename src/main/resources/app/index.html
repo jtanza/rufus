@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Rufus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+    <script src="/resources/ui-bootstrap-tpls-2.5.0.js"></script>
+    <script src="/scripts/hello.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono|Source+Sans+Pro" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles/custom.css" rel="stylesheet">
+</head>
+
+<body ng-app="home" ng-controller="Home">
+<nav class="navbar-top navbar navbar-default navbar-static-top">
+    <div class="container">
+        <p class="navbar-text" id="navbar-title"><a href="#frontpage">Rufus</a></p>
+        <div id="meta-nav">
+            <ul>
+                <li><a href="#">Login</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#"><i class="fa fa-code-fork" aria-hidden="true"></i></a></li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="sidebar-nav">
+                <div class="sidebar-list">
+                    <li><a href="#frontpage" ng-click="get('frontpage')"><i class="fa fa-newspaper-o" aria-hidden="true"></i>Front Page</a></li>
+                    <li><a href="#bookmarked" ng-click="get('bookmarked')"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
+                    <li><a href="#add"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
+                    <li class="separator"></li>
+                </div>
+                <div class="sidebar-list">
+                    <li><a href="#all" ng-click="get('all')"><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
+                    <div ng-repeat="tag in tags">
+                        <ul class="sidebar-list">
+                            <li class="sidebar-tags">
+                                <a href="#" ng-click="get('tagged', tag)">{{tag}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="row">
+
+                <div class="article-search">
+                    <form id="searchthis" action="/search" style="display:inline;" method="get">
+                        <input id="namanyay-search-box" name="q" size="40" type="text" placeholder="Search"/>
+                        <!-- <button id="namanyay-search-btn" type="submit">
+                             <i class="fa fa-search" aria-hidden="true"></i>
+                         </button> -->
+                    </form>
+                </div>
+
+                    <div ng-repeat="article in articles">
+                        <div class="col-md-8">
+                            <div class="well well-sm article-content">
+                                <div class="title">
+                                    <a  class="bookmark" href="#"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                                    <p><a href={{article.url}}>{{article.title}}</a></p>
+                                </div>
+                                <div class="description">
+                                    <p>{{article.description}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="meta well well-sm">
+                                <p><a href={{article.channelUrl}}>{{article.channelTitle}}</a></p>
+                                <p>{{article.publicationDate}}</p>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

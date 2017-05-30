@@ -1,0 +1,14 @@
+
+database:
+  # driverClass: org.h2.Driver
+  # url: jdbc:h2:./target/rufusdb 
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql:rufusdb
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      threshold: ALL
+      timeZone: UTC
+      target: stdout

@@ -1,0 +1,151 @@
+.navbar-top {
+    border: none;
+    background-color: #fff;
+    font-family: 'Source Sans Pro', sans-serif;
+    margin-bottom: 5%;
+}
+#navbar-title {
+    color: #000;
+    font-size: 30px;
+    margin-bottom: 0px;
+    margin-top: 30px;
+    margin-bottom: -20px;
+}
+
+#navbar-title a {
+    text-decoration: none;
+}
+
+#meta-nav {
+    float: right;
+    font-family: 'Source Sans Pro', sans-serif;
+    margin-top: 3%;
+}
+#meta-nav ul {
+    list-style: none;
+    word-spacing: 20px;
+}
+#meta-nav li {
+    display: inline;
+}
+#meta-nav a {
+    color: #000;
+}
+#meta-nav a:hover {
+    text-decoration: none;
+}
+#logo-container {}
+
+
+/*search*/
+.article-search {
+    margin-bottom: 3%;
+    margin-left: 48%;
+}
+
+/*
+#namanyay-search-btn {
+background-color: #fcfcfc;
+color:#000;
+padding:5px 10px;
+border:1px solid #000;
+border-radius:0px;
+font-family: 'Source Sans Pro', sans-serif;
+}
+*/
+
+#namanyay-search-box {
+background-color: #fcfcfc;
+padding:2px 10px;
+border:0 none;
+border:1px solid #000;
+width:160px;
+border-radius:0px;
+font-family: 'Source Sans Pro', sans-serif;
+color:#000;
+}
+
+
+.article-content {
+    background-color: #fcfcfc;
+    margin-bottom: 10px;
+    border: none;
+    box-shadow: none;
+}
+.title {
+    font-size: 110%;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: bold;
+}
+.description {
+    font-size: 90%;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+.meta {
+    background-color: #fff;
+    font-size: 90%;
+    font-family: 'Source Sans Pro', sans-serif;
+    border-top: 1px solid #f3f3f3;
+    border-style: solid none none none;
+    border-radius: 0px;
+    box-shadow: none;
+}
+.bookmark {
+    float: right;
+    margin-right: 2%;
+}
+.title a:hover {
+    text-decoration: none;
+    color: #95bff0;
+}
+a {
+    color: #000;
+}
+a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+/*side bar nav*/
+.sidebar-nav {
+    float: left;
+    position: fixed;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 90%;
+}
+.sidebar-nav .fa {
+    margin-right: 10px;
+}
+.separator {
+    width: 280px;
+    height: 10px;
+    position: relative;
+    z-index: 1;
+}
+.separator:before {
+    content: "";
+    position: absolute;
+    left: 27px;
+    bottom: 5px;
+    height: 1px;
+    width: 43%;
+    border-bottom: 1px dotted #95bff0;
+}
+.sidebar-tags {
+    margin:-10px 0px -20px;
+}
+.sidebar-list {
+    list-style: none;
+}
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #000;
+}
+.sidebar-nav li a:hover {
+    text-decoration: none;
+}
