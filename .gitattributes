@@ -1,4 +1,2 @@
+#ignore vendored code in web
 src/main/resources/app/dependencies/* linguist-vendored
-
-
-
