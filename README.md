@@ -1,17 +1,17 @@
-#Rufus
+# Rufus
 
 Rufus is a simple web based RSS reader written in Java 8 atop Dropwizard
 
->This project is stillin development
+> note: project still in development
 
-##Screenshots
+## Screenshots
 
-![rufus](i.imgur.com/nTjoo9i.png)
+![rufus](http://i.imgur.com/nTjoo9i.png)
 
 
-##Installation
+## Installation
 ...
 
-##Getting Started
+## Getting Started
 ...
 
