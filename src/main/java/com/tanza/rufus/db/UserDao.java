@@ -23,6 +23,10 @@ public interface UserDao {
     @SqlQuery("select * from rufususer where EMAIL = :email")
     User findByEmail(@Bind("email") String email);
 
+    @RegisterMapper(UserMapper.class)
+    @SqlQuery("select * from rufususer where email = :email and password = :password")
+    User findByEmailAndPassword(@Bind("email") String email, @Bind("password") String password);
+
     @SqlUpdate("insert into rufususer (ID, EMAIL) values (:id, :email)")
     void addUser(@BindBean User user);
 

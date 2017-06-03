@@ -1,5 +1,5 @@
 package com.tanza.rufus.auth;
-import com.tanza.rufus.core.Login;
+
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.UserDao;
 import io.dropwizard.auth.AuthenticationException;
@@ -25,8 +25,8 @@ public class BasicAuthenticator implements Authenticator<BasicCredentials, User>
         return u != null && u.getPassword().equals(creds.getPassword()) ? Optional.of(u) : Optional.empty();
     }
 
-    public Optional<User> authenticate(Login login) {
-        User u = userDao.findByEmail(login.getEmail());
-        return u != null && u.getPassword().equals(login.getPassword()) ? Optional.of(u) : Optional.empty();
+    public Optional<User> authenticate(String email, String password) {
+        User u = userDao.findByEmailAndPassword(email, password);
+        return u != null && u.getPassword().equals(password) ? Optional.of(u) : Optional.empty();
     }
 }
