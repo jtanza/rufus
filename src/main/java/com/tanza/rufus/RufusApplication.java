@@ -4,10 +4,9 @@ import com.tanza.rufus.auth.BasicAuthenticator;
 import com.tanza.rufus.auth.BasicAuthorizer;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
-import com.tanza.rufus.db.SessionDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.resources.ArticleResource;
-import com.tanza.rufus.resources.SessionResource;
+import com.tanza.rufus.resources.UserResource;
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -49,14 +48,31 @@ public class RufusApplication extends Application<RufusConfiguration> {
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), "postgresql");
 
+        /*
+        ResultSet rs = RunScript.execute(jdbi.open().getConnection(), new FileReader("sourcejoin.sql"));
+        while (rs.next()) {
+            System.out.println(rs.getString("source"));
+        }
+        rs.close();
+        */
+
+        /*
+        //init db
+        RunScript.execute(jdbi.open().getConnection(), new FileReader("update.sql"));
+        ResultSet execute = RunScript.execute(jdbi.open().getConnection(), new FileReader("sourcejoin.sql"));
+        execute.close();
+        */
+
+
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
-        final SessionDao sessionDao = jdbi.onDemand(SessionDao.class);
         env.jersey().register(new ArticleResource(userDao, articleDao));
-        env.jersey().register(new SessionResource(userDao, sessionDao));
+        env.jersey().register(new UserResource(userDao));
+
 
         //route source
         env.jersey().setUrlPattern("/api/*");
+
 
         //security
         env.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<User>()

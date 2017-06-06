@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 public class FeedUtils {
 
     private FeedUtils() {
-        throw new AssertionError(); //noninstantiability
+        //noninstantiability
+        throw new AssertionError();
     }
 
     /**
