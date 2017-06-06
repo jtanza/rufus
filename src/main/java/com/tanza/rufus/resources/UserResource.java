@@ -27,9 +27,9 @@ public class UserResource {
 
     @Path("/login")
     @POST
-    public Response login(@FormParam("login") Login login) {
+    public Response login(@FormParam("email") String email, @FormParam("password") String password) {
         BasicAuthenticator authenticator = new BasicAuthenticator(userDao);
-        Optional<User> user = authenticator.authenticate(login);
-        return user.isPresent() ? Response.ok(user).build() : Response.status(Status.UNAUTHORIZED).build();
+        Optional<User> user = authenticator.authenticate(email, password);
+        return user.isPresent() ? Response.ok().build() : Response.status(Status.UNAUTHORIZED).build();
     }
 }

@@ -41,6 +41,7 @@ public class RufusApplication extends Application<RufusConfiguration> {
                 return conf.getDataSourceFactory();
             }
         });
+        bootstrap.addBundle(new AssetsBundle("/app", "/", "index.html"));
     }
 
     @Override
@@ -48,27 +49,10 @@ public class RufusApplication extends Application<RufusConfiguration> {
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), "postgresql");
 
-        /*
-        ResultSet rs = RunScript.execute(jdbi.open().getConnection(), new FileReader("sourcejoin.sql"));
-        while (rs.next()) {
-            System.out.println(rs.getString("source"));
-        }
-        rs.close();
-        */
-
-        /*
-        //init db
-        RunScript.execute(jdbi.open().getConnection(), new FileReader("update.sql"));
-        ResultSet execute = RunScript.execute(jdbi.open().getConnection(), new FileReader("sourcejoin.sql"));
-        execute.close();
-        */
-
-
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
         env.jersey().register(new ArticleResource(userDao, articleDao));
         env.jersey().register(new UserResource(userDao));
-
 
         //route source
         env.jersey().setUrlPattern("/api/*");

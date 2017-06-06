@@ -56,10 +56,9 @@ public class FeedParser {
             SyndFeed feed = input.build(new XmlReader(url));
             return FeedParser.valid(url);
         } catch (Exception e) {
-            e.printStackTrace();
+            //TODO proper formatting of error messaging
+            return FeedParser.invalid(ValidationError.of("Could not parse URL!" + e));
         }
-        //TODO finish me
-        return FeedParser.invalid(ValidationError.of("Could not parse URL!"));
     }
 
     public boolean isValid() {

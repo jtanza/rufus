@@ -1,0 +1,19 @@
+<div ng-repeat="article in articles">
+    <div class="col-md-8">
+        <div class="well well-sm article-content">
+            <div class="title">
+                <a  class="bookmark" href="#"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                <p><a href={{article.url}}>{{article.title}}</a></p>
+            </div>
+            <div class="description">
+                <p>{{article.description}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="meta well well-sm">
+            <p><a href={{article.channelUrl}}>{{article.channelTitle}}</a></p>
+            <p>{{article.publicationDate}}</p>
+        </div>
+    </div>
+</div>

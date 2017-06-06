@@ -12,8 +12,6 @@ import com.tanza.rufus.feed.FeedUtils;
 
 import io.dropwizard.auth.Auth;
 
-import javax.annotation.security.PermitAll;
-
 import com.codahale.metrics.annotation.Timed;
 
 import javax.ws.rs.*;
@@ -65,8 +63,8 @@ public class ArticleResource {
 
     @Timed
     @Path("/tagged")
-    @POST
-    public Response byTag(@Auth User user, String tag) {
+    @GET
+    public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
         User u = userDao.findByEmail(user.getEmail());
         List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSourcesByTag(u.getId(), tag)), DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
@@ -104,6 +102,11 @@ public class ArticleResource {
     @Path("/new")
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
+
+        if (feeds.isEmpty()) {
+            return Response.noContent().build();
+        }
+
         //TODO should take comma or whitepace seperated list
         User u = userDao.findByEmail(user.getEmail());
         List<ValidationError> errors = new ArrayList<>();
