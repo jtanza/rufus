@@ -1,0 +1,11 @@
+<div class="col-md-8">
+    <h3>Subscribe to New Feeds</h3>
+    <div id="add-description">
+        <p>Accepts a whitespace separated list of RSS/Atom web feeds</p>
+        <p>Rejects invalid feeds, along with any which the user may already be subscribed to</p>
+    </div>
+    <form id="feed-form">
+        <textarea type="text" id="subscribe" ng-model="feed" class="form-control" rows="3" placeholder="http://rss.rufus.com/front_page.xml http://news.co/rss/breaking_news.rss" form="feed-form"></textarea>
+        <button type="submit" class="btn btn-default btn-sm" ng-click="add(feed)">Submit</button>
+    </form>
+</div>

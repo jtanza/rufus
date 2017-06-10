@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 public class FeedUtils {
 
     private FeedUtils() {
-        //noninstantiability
-        throw new AssertionError();
+        throw new AssertionError(); //noninstantiability
     }
 
     /**
@@ -62,6 +61,7 @@ public class FeedUtils {
 
     /**
      * Unescape html character entities and strip html tags from content
+     *
      * @param content
      * @return
      */

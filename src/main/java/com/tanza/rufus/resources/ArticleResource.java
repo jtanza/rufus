@@ -6,7 +6,6 @@ import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
-import com.tanza.rufus.feed.FeedParser.ValidationError;
 import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.feed.FeedUtils;
 
@@ -15,13 +14,10 @@ import io.dropwizard.auth.Auth;
 import com.codahale.metrics.annotation.Timed;
 
 import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.tanza.rufus.feed.FeedConstants.*;
@@ -102,24 +98,27 @@ public class ArticleResource {
     @Path("/new")
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
-
         if (feeds.isEmpty()) {
-            return Response.noContent().build();
+            throw new BadRequestException();
         }
 
-        //TODO should take comma or whitepace seperated list
         User u = userDao.findByEmail(user.getEmail());
-        List<ValidationError> errors = new ArrayList<>();
-        feeds.forEach(f -> {
-            FeedParser parser = FeedParser.parse(f);
-            if (parser.isValid()) {
-                userDao.addFeed(u.getId(), parser.getUrl().toString());
+
+        Set<String> pruned = new HashSet<>(feeds);
+        List<String> existing = userDao.getSources(u.getId()).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
+
+        List<FeedParser> feedResponses = new ArrayList<>();
+        pruned.forEach((String f) -> {
+            if (existing.contains(f)) {
+                feedResponses.add(FeedParser.invalid("Already Subscribed to Feed!", f));
             } else {
-                errors.add(parser.getError());
+                FeedParser parser = FeedParser.parse(f);
+                if (parser.isValid()) {
+                    userDao.addFeed(u.getId(), parser.getUrl());
+                }
+                feedResponses.add(parser);
             }
         });
-        return errors.isEmpty()
-                ? Response.ok().build()
-                : Response.status(Status.fromStatusCode(418)).entity(errors).build();
+        return Response.ok(feedResponses).build();
     }
 }

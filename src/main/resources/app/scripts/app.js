@@ -27,6 +27,11 @@ app.config(function($routeProvider) {
     .when('/tagged/:param', {
         templateUrl : 'pages/articles.html',
         controller  : 'taggedController'
+    })
+
+    .when('/add', {
+        templateUrl : 'pages/addFeeds.html',
+        controller  : 'addFeedsController'
     });
 });
 
@@ -64,7 +69,14 @@ app.controller('taggedController', function($scope, $http, $routeParams) {
   });
 })
 
-
+app.controller('addFeedsController', function($scope, $http) {
+    $scope.add = function(feed) {
+        var feedArray = feed.split(" ");
+        $http.post('api/articles/new', feedArray).then(function(response) {
+            console.log(response);
+        })
+    };
+})
 
 
 

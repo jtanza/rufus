@@ -35,7 +35,7 @@
                 <div class="sidebar-list">
                     <li><a href="#frontpage"><i class="fa fa-newspaper-o" aria-hidden="true"></i>Front Page</a></li>
                     <li><a href="#bookmarked"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
-                    <li><a href="#/add"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
+                    <li><a href="#add"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
                     <li class="separator"></li>
                 </div>
                 <div class="sidebar-list">
@@ -50,40 +50,9 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-9">
             <div class="row">
-
-                <div class="article-search">
-                    <form id="searchthis" action="/search" style="display:inline;" method="get">
-                        <input id="namanyay-search-box" name="q" size="40" type="text" placeholder="Search"/>
-                    </form>
-                </div>
-
                 <div ng-view></div>
-
-                <!--
-                    <div ng-repeat="article in articles">
-                        <div class="col-md-8">
-                            <div class="well well-sm article-content">
-                                <div class="title">
-                                    <a  class="bookmark" href="#"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
-                                    <p><a href={{article.url}}>{{article.title}}</a></p>
-                                </div>
-                                <div class="description">
-                                    <p>{{article.description}}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="meta well well-sm">
-                                <p><a href={{article.channelUrl}}>{{article.channelTitle}}</a></p>
-                                <p>{{article.publicationDate}}</p>
-                            </div>
-                        </div>
-                    </div>
-                    -->
-
             </div>
         </div>
     </div>
