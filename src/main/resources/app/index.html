@@ -16,7 +16,7 @@
 <body ng-app="home" ng-controller="homeController">
 <nav class="navbar-top navbar navbar-default navbar-static-top">
     <div class="container">
-        <p class="navbar-text" id="navbar-title"><a href="/">Rufus</a></p>
+        <p class="navbar-text" id="navbar-title"><a href="#frontpage">Rufus</a></p>
         <div id="meta-nav">
             <ul>
                 <li><a href="#">Login</a></li>
@@ -39,11 +39,14 @@
                     <li class="separator"></li>
                 </div>
                 <div class="sidebar-list">
-                    <li><a href="#all"><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
+                    <li><a href="#all"><i class="fa fa-globe" aria-hidden="true"></i>All Feeds</a></li>
+                    <li><a href="" ng-click="showTags = !showTags"><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
                     <div ng-repeat="tag in tags">
                         <ul class="sidebar-list">
                             <li class="sidebar-tags">
-                                <a ng-href="#tagged/{{tag}}">{{tag}}</a>
+                                <div ng-show="showTags">
+                                    <a ng-href="#tagged/{{tag}}">{{tag}}</a>
+                                </div>
                             </li>
                         </ul>
                     </div>
