@@ -32,6 +32,18 @@ app.config(function($routeProvider) {
     .when('/add', {
         templateUrl : 'pages/addFeeds.html',
         controller  : 'addFeedsController'
+    })
+
+    .when('/about', {
+        templateUrl : 'pages/about.html'
+    })
+
+    .when('/settings', {
+        templateUrl : 'pages/settings.html'
+    })
+
+    .when('/login', {
+        templateUrl : 'pages/login.html'
     });
 });
 
