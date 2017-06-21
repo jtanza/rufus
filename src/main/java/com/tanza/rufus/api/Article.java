@@ -1,6 +1,8 @@
 package com.tanza.rufus.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -19,6 +21,9 @@ public class Article {
     private String url;
     private String channelTitle;
     private String channelUrl;
+    private boolean bookmark;
+
+    public Article() {} //jackson dummy constructor
 
     public Article(String title, Date publicationDate, List authors, String description, String url, String channelTitle, String channelUrl) {
         this.title = Objects.requireNonNull(title, "title must not be null!");
@@ -63,6 +68,36 @@ public class Article {
         return channelUrl;
     }
 
+    public boolean isBookmark() {
+        return bookmark;
+    }
+
+    public void setBookmark(boolean bookmark) {
+        this.bookmark = bookmark;
+    }
     public static Comparator<Article> byDate = Comparator.comparing(Article::getPublicationDate);
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Article)) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        Article article = (Article) o;
+        return new EqualsBuilder()
+                .append(title, article.getTitle())
+                .append(channelUrl, article.getChannelUrl())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 23)
+                .append(title)
+                .append(channelUrl)
+                .toHashCode();
+    }
 }
 

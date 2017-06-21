@@ -25,30 +25,33 @@ public class FeedProcessor {
      * @param requests
      * @return
      */
-    public List<Article> buildArticleCollection(List<RufusFeed> requests) {
-        return buildArticleCollection(requests, false, 0);
+    public List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks) {
+        return buildArticleCollection(requests, bookmarks, false, 0);
     }
 
     /**
      * @param requests
      * @return
      */
-    public List<Article> buildArticleCollection(List<RufusFeed> requests, int docsPerChannel) {
-        return buildArticleCollection(requests, true, docsPerChannel);
+    public List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks, int docsPerChannel) {
+        return buildArticleCollection(requests, bookmarks, true, docsPerChannel);
     }
 
-    private List<Article> buildArticleCollection(List<RufusFeed> requests, boolean limit, int docsPerFeed) {
+
+    private List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks, boolean limit, int docsPerFeed) {
         Map<Channel, List<Document>> docMap = buildChannelMap(requests);
         List<Article> articles = new ArrayList<>();
         if (limit) {
-            docMap.entrySet().forEach(e -> {
-                articles.addAll(e.getValue().stream().limit(docsPerFeed).map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList()));
-            });
+            docMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
+                    .limit(docsPerFeed)
+                    .map(d -> Article.of(e.getKey(), d))
+                    .collect(Collectors.toList())));
         } else {
-            docMap.entrySet().forEach(e -> {
-                articles.addAll(e.getValue().stream().map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList()));
-            });
+            docMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
+                    .map(d -> Article.of(e.getKey(), d))
+                    .collect(Collectors.toList())));
         }
+        syncBookmarks(articles, bookmarks);
         return FeedUtils.sort(articles);
     }
 
@@ -56,11 +59,6 @@ public class FeedProcessor {
     private Pair<SyndFeed, List<SyndEntry>> generateFeedPair(RufusFeed request) {
         SyndFeed feed = request.getFeed();
         return ImmutablePair.of(feed, feed.getEntries());
-    }
-
-    private Pair<Channel, List<Document>> buildChannelPair(RufusFeed request) {
-        Pair<SyndFeed, List<SyndEntry>> synd = generateFeedPair(request);
-        return ImmutablePair.of(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink()), extractDocuments(synd, true));
     }
 
     private Map<Channel, List<Document>> buildChannelMap(List<RufusFeed> requests) {
@@ -90,6 +88,10 @@ public class FeedProcessor {
             ));
         });
         return ret;
+    }
+
+    private void syncBookmarks(List<Article> articles, Set<Article> bookmarks) {
+        articles.stream().filter(bookmarks::contains).forEach(a -> a.setBookmark(true));
     }
 }
 

@@ -12,6 +12,8 @@ import com.tanza.rufus.feed.FeedUtils;
 import io.dropwizard.auth.Auth;
 
 import com.codahale.metrics.annotation.Timed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.BadRequestException;
@@ -28,6 +30,7 @@ import static com.tanza.rufus.feed.FeedConstants.*;
 @Path("/articles")
 @Produces(MediaType.APPLICATION_JSON)
 public class ArticleResource {
+    private static final Logger logger = LoggerFactory.getLogger(ArticleResource.class);
 
     private final FeedProcessor processor = new FeedProcessor();
     private final UserDao userDao;
@@ -42,9 +45,10 @@ public class ArticleResource {
     @Path("/frontpage")
     @GET
     public Response frontPage(@Auth User user) {
-        User u = userDao.findByEmail(user.getEmail());
-        List<Source> sources = userDao.getSources(u.getId()).stream().filter(Source::isFrontpage).collect(Collectors.toList());
-        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(sources), DEFAULT_DOCS_PER_FEED);
+        int userId = userDao.findByEmail(user.getEmail()).getId();
+        List<Source> sources = userDao.getSources(userId).stream().filter(Source::isFrontpage).collect(Collectors.toList());
+        Set<Article> bookmarks = articleDao.getBookmarked(userId);
+        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(sources), bookmarks, DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
     }
 
@@ -53,16 +57,18 @@ public class ArticleResource {
     @Produces("application/json")
     @GET
     public List<Article> all(@Auth User user) {
-        User u = userDao.findByEmail(user.getEmail());
-        return processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSources(u.getId())));
+        int userId = userDao.findByEmail(user.getEmail()).getId();
+        Set<Article> bookmarks = articleDao.getBookmarked(userId);
+        return processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSources(userId)),bookmarks);
     }
 
     @Timed
     @Path("/tagged")
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
-        User u = userDao.findByEmail(user.getEmail());
-        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSourcesByTag(u.getId(), tag)), DEFAULT_DOCS_PER_FEED);
+        int userId = userDao.findByEmail(user.getEmail()).getId();
+        Set<Article> bookmarks = articleDao.getBookmarked(userId);
+        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSourcesByTag(userId, tag)), bookmarks, DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
     }
 
@@ -81,7 +87,31 @@ public class ArticleResource {
     @POST
     public Response bookmark(@Auth User user, Article article) {
         User u = userDao.findByEmail(user.getEmail());
+        if (articleDao.getBookmarked(u.getId()).contains(article)) {
+            throw new BadRequestException("Article is already bookmarked!");
+        }
+
         articleDao.bookmarkArticle(u.getId(), article);
+        return Response.ok().build();
+    }
+
+    @Timed
+    @Path("/isBookmarked")
+    @Consumes("application/json")
+    @POST
+    public Response isBookmarked(@Auth User user, Article article) {
+        User u = userDao.findByEmail(user.getEmail());
+        boolean isBookmarked = articleDao.getBookmarked(u.getId()).contains(article);
+        return Response.ok(isBookmarked).build();
+    }
+
+    @Timed
+    @Path("/removeBookmark")
+    @Consumes("application/json")
+    @POST
+    public Response removeBookmark(@Auth User user, Article article) {
+        User u = userDao.findByEmail(user.getEmail());
+        articleDao.removeArticle(u.getId(), article.getUrl());
         return Response.ok().build();
     }
 
@@ -90,7 +120,7 @@ public class ArticleResource {
     @GET
     public Response bookmarked(@Auth User user) {
         User u = userDao.findByEmail(user.getEmail());
-        List<Article> bookmarked = articleDao.getBookmarked(u.getId());
+        Set<Article> bookmarked = articleDao.getBookmarked(u.getId());
         return Response.ok(bookmarked).build();
     }
 

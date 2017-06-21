@@ -7,19 +7,24 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * Created by jtanza.
+ * Dao for saved articles (bookmarks)
+ *
  */
 @RegisterMapper(ArticleMapper.class)
 public interface ArticleDao {
 
     @SqlQuery("select * from rufususer left outer join articles on rufususer.userid = articles.userid where rufususer.userid = :id")
-    List<Article> getBookmarked(@Bind("id") int id);
+    Set<Article> getBookmarked(@Bind("id") int id);
 
     @SqlUpdate(
             "insert into articles(userid, title, date, description, url, channelTitle, channelUrl, authors)" +
             "values ((select userid from rufususer where userid = :id), :title, :date, :description, :url, :channelTitle, :channelUrl, :authors)"
     )
     void bookmarkArticle(@Bind("id") int id, @BindArticle Article article);
+
+    @SqlUpdate("delete from articles where userid = :id and url = :url")
+    void removeArticle(@Bind("id") int id, @Bind("url") String url);
 }

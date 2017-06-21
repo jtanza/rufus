@@ -7,7 +7,12 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,20 +25,23 @@ public class ArticleMapper implements ResultSetMapper<Article>{
 
         Array articles = resultSet.getArray("authors");
         if (articles == null) {
-            //TODO this probably shouldnt throw a re
-            //should probably be an optional
+            //TODO refactor to return optional
            throw new RuntimeException("No articles bookmarked!");
         }
 
-        List<String> asList = Arrays.asList((String[]) articles.getArray());
-        return new Article (
+        Date date = new Date(resultSet.getTimestamp("date").getTime());
+        List<String> authors = Arrays.asList((String[]) articles.getArray());
+
+        Article article = new Article (
                 resultSet.getString("title"),
-                resultSet.getDate("date"),
-                asList,
+                date,
+                authors,
                 resultSet.getString("description"),
                 resultSet.getString("url"),
                 resultSet.getString("channelTitle"),
                 resultSet.getString("channelUrl")
         );
+        article.setBookmark(true); //saved articles are always bookmarked articles
+        return article;
     }
 }

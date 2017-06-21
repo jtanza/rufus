@@ -1,13 +1,10 @@
-<div class="article-search">
-    <form id="searchthis" action="/search" style="display:inline;" method="get">
-        <input id="namanyay-search-box" name="q" size="40" type="text" placeholder="Search"/>
-    </form>
-</div>
 <div ng-repeat="article in articles">
     <div class="col-md-8">
         <div class="well well-sm article-content">
             <div class="title">
-                <a  class="bookmark" href="#"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                <a class="bookmark" ng-click="bookmark(article)">
+                    <i class="fa" ng-class="{'fa-bookmark-o': !article.bookmark , 'fa-bookmark': article.bookmark }" aria-hidden="true"></i>
+                </a>
                 <p><a href={{article.url}}>{{article.title}}</a></p>
             </div>
             <div class="description">
