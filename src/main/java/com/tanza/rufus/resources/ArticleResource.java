@@ -1,7 +1,5 @@
 package com.tanza.rufus.resources;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
@@ -21,7 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
