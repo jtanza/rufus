@@ -1,5 +1,7 @@
 package com.tanza.rufus.resources;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
@@ -19,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,6 +90,7 @@ public class ArticleResource {
     @POST
     public Response bookmark(@Auth User user, Article article) {
         User u = userDao.findByEmail(user.getEmail());
+
         if (articleDao.getBookmarked(u.getId()).contains(article)) {
             throw new BadRequestException("Article is already bookmarked!");
         }
@@ -150,5 +154,19 @@ public class ArticleResource {
             }
         });
         return Response.ok(feedResponses).build();
+    }
+
+    private class MessageWrapper {
+        private String message;
+
+        public MessageWrapper() {} //dummy jackson constructor
+
+        public MessageWrapper(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

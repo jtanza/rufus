@@ -43,14 +43,22 @@ app.config(function($routeProvider) {
 
         .when('/login', {
             templateUrl: 'pages/login.html'
+        })
+
+        .when('/error', {
+            templateUrl: 'pages/error.html'
         });
 });
 
 
-app.controller('homeController', function($scope, $http) {
+app.controller('homeController', function($scope, $http, $location) {
 
-    $http.get('api/articles/frontpage').then(function(response) {
+    $http.get('api/articles/frontpage').then(function success(response) {
         $scope.articles = response.data;
+    }, function error(response){
+        $location.path('/error');
+        $scope.errCode = response.status;
+        $scope.errMessage = response.data.message;
     });
 
     $http.get('api/articles/tagStubs').then(function(response) {
@@ -58,13 +66,22 @@ app.controller('homeController', function($scope, $http) {
     });
 
     $scope.bookmark = function(article) {
-        //TODO if not successful alert!
         if (article.bookmark) {
-           $http.post('api/articles/removeBookmark', article);
-           article.bookmark = false;
+           $http.post('api/articles/removeBookmark', article).then(function success(response){
+               article.bookmark = false;
+           }, function error(response) {
+               $location.path('/error');
+               $scope.errCode = response.status;
+               $scope.errMessage = response.data.message;
+           });
         } else {
-           $http.post('api/articles/bookmark', article);
-           article.bookmark = true;
+           $http.post('api/articles/bookmark', article).then(function(response) {
+                article.bookmark = true;
+           }, function error(response) {
+               $location.path('/error');
+               $scope.errCode = response.status;
+               $scope.errMessage = response.data.message;
+           });
          }
     }
 
@@ -77,13 +94,22 @@ app.controller('bookmarkedController', function($scope, $http) {
     });
 
     $scope.bookmark = function(article) {
-        //TODO if not successful alert!
         if (article.bookmark) {
-           $http.post('api/articles/removeBookmark', article);
-           article.bookmark = false;
+           $http.post('api/articles/removeBookmark', article).then(function success(response){
+               article.bookmark = false;
+           }, function error(response) {
+               $location.path('/error');
+               $scope.errCode = response.status;
+               $scope.errMessage = response.data.message;
+           });
         } else {
-           $http.post('api/articles/bookmark', article);
-           article.bookmark = true;
+           $http.post('api/articles/bookmark', article).then(function(response) {
+                article.bookmark = true;
+           }, function error(response) {
+               $location.path('/error');
+               $scope.errCode = response.status;
+               $scope.errMessage = response.data.message;
+           });
          }
     }
 })
