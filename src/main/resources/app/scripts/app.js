@@ -5,22 +5,34 @@ app.config(function($routeProvider) {
 
         .when('/', {
             templateUrl: 'pages/articles.html',
-            controller: 'homeController'
+            controller: 'homeController',
+            resolve : {
+                resource : function($route) {$route.current.params.resource = 'api/articles/frontpage'}
+            }
         })
 
         .when('/bookmarked', {
             templateUrl: 'pages/articles.html',
-            controller: 'bookmarkedController'
+            controller: 'homeController',
+            resolve : {
+                resource : function($route) {$route.current.params.resource = 'api/articles/bookmarked'}
+            }
         })
 
         .when('/frontpage', {
             templateUrl: 'pages/articles.html',
-            controller: 'frontpageController'
+            controller: 'homeController',
+            resolve : {
+                resource : function($route) {$route.current.params.resource = 'api/articles/frontpage'}
+            }
         })
 
         .when('/all', {
             templateUrl: 'pages/articles.html',
-            controller: 'allController'
+            controller: 'homeController',
+            resolve : {
+                resource : function($route) {$route.current.params.resource = 'api/articles/all'}
+            }
         })
 
         .when('/tagged/:param', {
@@ -51,11 +63,10 @@ app.config(function($routeProvider) {
 });
 
 
-app.controller('homeController', function($scope, $http, $location) {
-
-    $http.get('api/articles/frontpage').then(function success(response) {
+app.controller('homeController', function($scope, $http, $location, $routeParams) {
+    $http.get($routeParams.resource).then(function success(response) {
         $scope.articles = response.data;
-    }, function error(response){
+    }, function error(response) {
         $location.path('/error');
         $scope.errCode = response.status;
         $scope.errMessage = response.data.message;
@@ -84,47 +95,7 @@ app.controller('homeController', function($scope, $http, $location) {
            });
          }
     }
-
 });
-
-app.controller('bookmarkedController', function($scope, $http) {
-
-    $http.get('api/articles/bookmarked').then(function(response) {
-        $scope.articles = response.data;
-    });
-
-    $scope.bookmark = function(article) {
-        if (article.bookmark) {
-           $http.post('api/articles/removeBookmark', article).then(function success(response){
-               article.bookmark = false;
-           }, function error(response) {
-               $location.path('/error');
-               $scope.errCode = response.status;
-               $scope.errMessage = response.data.message;
-           });
-        } else {
-           $http.post('api/articles/bookmark', article).then(function(response) {
-                article.bookmark = true;
-           }, function error(response) {
-               $location.path('/error');
-               $scope.errCode = response.status;
-               $scope.errMessage = response.data.message;
-           });
-         }
-    }
-})
-
-app.controller('frontpageController', function($scope, $http) {
-    $http.get('api/articles/frontpage').then(function(response) {
-        $scope.articles = response.data;
-    });
-})
-
-app.controller('allController', function($scope, $http) {
-    $http.get('api/articles/all').then(function(response) {
-        $scope.articles = response.data;
-    });
-})
 
 app.controller('taggedController', function($scope, $http, $routeParams) {
     $http.get('api/articles/tagged?tag=' + $routeParams.param).then(function(response) {
