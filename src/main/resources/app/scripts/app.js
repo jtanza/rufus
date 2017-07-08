@@ -2,76 +2,59 @@ var app = angular.module('home', ['ngRoute']);
 
 app.config(function($routeProvider) {
     $routeProvider
-
         .when('/', {
             templateUrl: 'pages/articles.html',
-            controller: 'homeController',
-            resolve : {
-                resource : function($route) {$route.current.params.resource = 'api/articles/frontpage'}
-            }
+            controller: 'resourceController',
+            resource : 'api/articles/frontpage'
         })
-
         .when('/bookmarked', {
             templateUrl: 'pages/articles.html',
-            controller: 'homeController',
-            resolve : {
-                resource : function($route) {$route.current.params.resource = 'api/articles/bookmarked'}
-            }
+            controller: 'resourceController',
+            resource : 'api/articles/bookmarked'
         })
-
         .when('/frontpage', {
             templateUrl: 'pages/articles.html',
-            controller: 'homeController',
-            resolve : {
-                resource : function($route) {$route.current.params.resource = 'api/articles/frontpage'}
-            }
+            controller: 'resourceController',
+            resource : 'api/articles/frontpage'
         })
-
         .when('/all', {
             templateUrl: 'pages/articles.html',
-            controller: 'homeController',
-            resolve : {
-                resource : function($route) {$route.current.params.resource = 'api/articles/all'}
-            }
+            controller: 'resourceController',
+            resource : 'api/articles/all'
         })
-
         .when('/tagged/:param', {
             templateUrl: 'pages/articles.html',
             controller: 'taggedController'
         })
-
         .when('/add', {
             templateUrl: 'pages/addFeeds.html',
             controller: 'addFeedsController'
         })
-
         .when('/about', {
             templateUrl: 'pages/about.html'
         })
-
         .when('/settings', {
             templateUrl: 'pages/settings.html'
         })
-
         .when('/login', {
             templateUrl: 'pages/login.html'
         })
-
         .when('/error', {
             templateUrl: 'pages/error.html'
         });
-});
+    });
 
-
-app.controller('homeController', function($scope, $http, $location, $routeParams) {
-    $http.get($routeParams.resource).then(function success(response) {
+ app.controller('resourceController', ['$scope', '$route', '$http', '$location', function ($scope, $route, $http, $location) {
+    $http.get($route.current.$$route.resource).then(function success(response) {
         $scope.articles = response.data;
     }, function error(response) {
         $location.path('/error');
         $scope.errCode = response.status;
         $scope.errMessage = response.data.message;
     });
+ }]);
 
+ app.controller('homeController', ['$scope', '$route', '$http', '$location', function ($scope, $route, $http, $location) {
     $http.get('api/articles/tagStubs').then(function(response) {
         $scope.tags = response.data;
     });
@@ -95,7 +78,7 @@ app.controller('homeController', function($scope, $http, $location, $routeParams
            });
          }
     }
-});
+ }]);
 
 app.controller('taggedController', function($scope, $http, $routeParams) {
     $http.get('api/articles/tagged?tag=' + $routeParams.param).then(function(response) {
