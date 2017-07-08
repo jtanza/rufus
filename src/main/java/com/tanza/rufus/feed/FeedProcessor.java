@@ -1,9 +1,17 @@
 package com.tanza.rufus.feed;
 
+import com.tanza.rufus.api.*;
+import com.tanza.rufus.core.User;
+import com.tanza.rufus.db.ArticleDao;
+import com.tanza.rufus.db.UserDao;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
-import com.tanza.rufus.api.*;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,38 +20,100 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * @author jtanza
  */
 public class FeedProcessor {
-
     private static final Logger logger = LoggerFactory.getLogger(FeedProcessor.class);
 
-    /**
-     * @param requests
-     * @return
-     */
-    public List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks) {
-        return buildArticleCollection(requests, bookmarks, false, 0);
+    private static final int MAX_CACHE = 10_000;
+    private static final int TTL = 3;
+
+    private final UserDao userDao;
+    private final ArticleDao articleDao;
+
+    private LoadingCache<Integer, Map<Channel, List<Document>>> articleCache;
+
+    private FeedProcessor(UserDao userDao, ArticleDao articleDao) {
+        this.userDao = userDao;
+        this.articleDao = articleDao;
     }
 
-    /**
-     * @param requests
-     * @return
-     */
-    public List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks, int docsPerChannel) {
-        return buildArticleCollection(requests, bookmarks, true, docsPerChannel);
+    public static FeedProcessor newInstance(UserDao userDao, ArticleDao articleDao) {
+        FeedProcessor feedProcessor = new FeedProcessor(userDao, articleDao);
+        feedProcessor.init();
+        return feedProcessor;
     }
 
+    //TODO cache invalidation if just a ttl proves insufficient
+    public void init() {
+        articleCache = CacheBuilder.newBuilder()
+                .maximumSize(MAX_CACHE)
+                .expireAfterAccess(TTL, TimeUnit.MINUTES)
+                .build(
+                        new CacheLoader<Integer, Map<Channel, List<Document>>>() {
+                            @Override
+                            public Map<Channel, List<Document>> load(Integer userId) throws Exception {
+                                return getCollection(userId);
+                            }
+                        }
+                );
+    }
 
-    private List<Article> buildArticleCollection(List<RufusFeed> requests, Set<Article> bookmarks, boolean limit, int docsPerFeed) {
-        Map<Channel, List<Document>> docMap = buildChannelMap(requests);
+    public List<Article> buildArticleCollection(User user) {
+        return loadArticles(user, false, 0);
+    }
+
+    public List<Article> buildArticleCollection(User user, int docsPerChannel) {
+        return loadArticles(user, true, docsPerChannel);
+    }
+
+    public List<Article> buildTagCollection(User user, String tag) {
+        int userId = user.getId();
+
+        Map<Channel, List<Document>> docMap;
+        try {
+            docMap = articleCache.get(userId);
+        } catch (ExecutionException e) {
+            logger.error("could not load cache for user {}, loading articles..", userId);
+            docMap = getCollection(userId);
+        }
+
+        Map<Channel, List<Document>> tagged = docMap.entrySet().stream()
+                .filter(e -> e.getKey().getTags().contains(tag))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
         List<Article> articles = new ArrayList<>();
+        tagged.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
+                .map(d -> Article.of(e.getKey(), d))
+                .collect(Collectors.toList())));
+
+        syncBookmarks(articles, articleDao.getBookmarked(userId));
+        return FeedUtils.sort(articles);
+    }
+
+    private List<Article> loadArticles(User user, boolean limit, int docsPerChannel) {
+        int userId = user.getId();
+
+        Map<Channel, List<Document>> docMap;
+        try {
+            docMap = articleCache.get(userId);
+        } catch (ExecutionException e) {
+            logger.error("could not load cache for user {}, loading articles..", userId);
+            docMap = getCollection(userId);
+        }
+
+        List<Article> articles = new ArrayList<>();
+        Set<Article> bookmarks = articleDao.getBookmarked(userId);
+
         if (limit) {
             docMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
-                    .limit(docsPerFeed)
+                    .limit(docsPerChannel)
                     .map(d -> Article.of(e.getKey(), d))
                     .collect(Collectors.toList())));
         } else {
@@ -51,8 +121,16 @@ public class FeedProcessor {
                     .map(d -> Article.of(e.getKey(), d))
                     .collect(Collectors.toList())));
         }
+
         syncBookmarks(articles, bookmarks);
         return FeedUtils.sort(articles);
+    }
+
+    private Map<Channel, List<Document>> getCollection(int userId) {
+        List<Source> sources = userDao.getSources(userId).stream().filter(Source::isFrontpage).collect(Collectors.toList());
+        List<RufusFeed> requests = FeedUtils.sourceToFeed(sources);
+
+        return buildChannelMap(requests);
     }
 
     @SuppressWarnings("unchecked")
@@ -65,7 +143,7 @@ public class FeedProcessor {
         Map<Channel, List<Document>> ret = new HashMap<>();
         requests.forEach(r -> {
             Pair<SyndFeed, List<SyndEntry>> synd = generateFeedPair(r);
-            ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink()), extractDocuments(synd, true));
+            ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink(), r.getTags()), extractDocuments(synd, true));
         });
         return ret;
     }

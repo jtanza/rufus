@@ -7,7 +7,6 @@ import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
-import com.tanza.rufus.feed.FeedUtils;
 
 import io.dropwizard.auth.Auth;
 
@@ -33,23 +32,21 @@ import static com.tanza.rufus.feed.FeedConstants.*;
 public class ArticleResource {
     private static final Logger logger = LoggerFactory.getLogger(ArticleResource.class);
 
-    private final FeedProcessor processor = new FeedProcessor();
     private final UserDao userDao;
     private final ArticleDao articleDao;
+    private final FeedProcessor processor;
 
-    public ArticleResource(UserDao userDao, ArticleDao articleDao) {
+    public ArticleResource(UserDao userDao, ArticleDao articleDao, FeedProcessor processor) {
         this.userDao = userDao;
         this.articleDao = articleDao;
+        this.processor = processor;
     }
 
     @Timed
     @Path("/frontpage")
     @GET
     public Response frontPage(@Auth User user) {
-        int userId = userDao.findByEmail(user.getEmail()).getId();
-        List<Source> sources = userDao.getSources(userId).stream().filter(Source::isFrontpage).collect(Collectors.toList());
-        Set<Article> bookmarks = articleDao.getBookmarked(userId);
-        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(sources), bookmarks, DEFAULT_DOCS_PER_FEED);
+        List<Article> articles = processor.buildArticleCollection(user, DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
     }
 
@@ -57,19 +54,16 @@ public class ArticleResource {
     @Path("/all")
     @Produces("application/json")
     @GET
-    public List<Article> all(@Auth User user) {
-        int userId = userDao.findByEmail(user.getEmail()).getId();
-        Set<Article> bookmarks = articleDao.getBookmarked(userId);
-        return processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSources(userId)),bookmarks);
+    public Response all(@Auth User user) {
+        List<Article> articles = processor.buildArticleCollection(user);
+        return Response.ok(articles).build();
     }
 
     @Timed
     @Path("/tagged")
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
-        int userId = userDao.findByEmail(user.getEmail()).getId();
-        Set<Article> bookmarks = articleDao.getBookmarked(userId);
-        List<Article> articles = processor.buildArticleCollection(FeedUtils.sourceToFeed(userDao.getSourcesByTag(userId, tag)), bookmarks, DEFAULT_DOCS_PER_FEED);
+        List<Article> articles = processor.buildTagCollection(user, tag);
         return Response.ok(articles).build();
     }
 

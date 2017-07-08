@@ -1,21 +1,25 @@
 package com.tanza.rufus.api;
 
+import java.util.List;
+
 /**
  * @author jtanza
  */
 public class Channel {
-    private String title;
-    private String language;
-    private String url;
+    private final String title;
+    private final String language;
+    private final String url;
+    private final List<String> tags;
 
-    private Channel(String title, String language, String url) {
+    private Channel(String title, String language, String url, List<String> tags) {
         this.title = title;
         this.language = language;
         this.url = url;
+        this.tags = tags;
     }
 
-    public static Channel of(String title, String language, String url) {
-        return new Channel(title, language, url);
+    public static Channel of(String title, String language, String url, List<String> tags) {
+        return new Channel(title, language, url, tags);
     }
 
     public String getTitle() {
@@ -28,6 +32,10 @@ public class Channel {
 
     public String getUrl() {
         return url;
+    }
+
+    public List<String> getTags() {
+        return tags;
     }
 }
 

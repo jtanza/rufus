@@ -5,6 +5,7 @@ import com.tanza.rufus.auth.BasicAuthorizer;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
+import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.resources.ArticleResource;
 import com.tanza.rufus.resources.UserResource;
 
@@ -13,12 +14,14 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.cli.EnvironmentCommand;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import org.skife.jdbi.v2.DBI;
@@ -51,7 +54,9 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
-        env.jersey().register(new ArticleResource(userDao, articleDao));
+        final FeedProcessor processor = FeedProcessor.newInstance(userDao, articleDao);
+
+        env.jersey().register(new ArticleResource(userDao, articleDao, processor));
         env.jersey().register(new UserResource(userDao));
 
         //route source
