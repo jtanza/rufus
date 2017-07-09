@@ -5,6 +5,7 @@ import com.tanza.rufus.auth.BasicAuthorizer;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
+import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.resources.ArticleResource;
 import com.tanza.rufus.resources.UserResource;
@@ -55,8 +56,9 @@ public class RufusApplication extends Application<RufusConfiguration> {
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
         final FeedProcessor processor = FeedProcessor.newInstance(userDao, articleDao);
+        final FeedParser parser = new FeedParser(userDao);
 
-        env.jersey().register(new ArticleResource(userDao, articleDao, processor));
+        env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(new UserResource(userDao));
 
         //route source

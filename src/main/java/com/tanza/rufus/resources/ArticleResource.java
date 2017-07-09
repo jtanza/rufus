@@ -1,5 +1,6 @@
 package com.tanza.rufus.resources;
 
+import com.sun.syndication.feed.atom.Feed;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
@@ -35,11 +36,18 @@ public class ArticleResource {
     private final UserDao userDao;
     private final ArticleDao articleDao;
     private final FeedProcessor processor;
+    private final FeedParser parser;
 
-    public ArticleResource(UserDao userDao, ArticleDao articleDao, FeedProcessor processor) {
+    public ArticleResource (
+            UserDao userDao,
+            ArticleDao articleDao,
+            FeedProcessor processor,
+            FeedParser parser
+    ) {
         this.userDao = userDao;
         this.articleDao = articleDao;
         this.processor = processor;
+        this.parser = parser;
     }
 
     @Timed
@@ -72,7 +80,12 @@ public class ArticleResource {
     @GET
     public Response tagStubs(@Auth User user) {
         User u = userDao.findByEmail(user.getEmail());
-        Set<String> tags = userDao.getSources(u.getId()).stream().map(Source::getTags).filter(Objects::nonNull).flatMap(List::stream).collect(Collectors.toSet());
+        Set<String> tags = userDao.getSources(u.getId()).stream()
+                .map(Source::getTags)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
+
         return Response.ok(tags).build();
     }
 
@@ -124,28 +137,8 @@ public class ArticleResource {
     @Path("/new")
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
-        if (feeds.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        User u = userDao.findByEmail(user.getEmail());
-
-        Set<String> pruned = new HashSet<>(feeds);
-        List<String> existing = userDao.getSources(u.getId()).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
-
-        List<FeedParser> feedResponses = new ArrayList<>();
-        pruned.forEach((String f) -> {
-            if (existing.contains(f)) {
-                feedResponses.add(FeedParser.invalid("Already Subscribed to Feed!", f));
-            } else {
-                FeedParser parser = FeedParser.parse(f);
-                if (parser.isValid()) {
-                    userDao.addFeed(u.getId(), parser.getUrl());
-                }
-                feedResponses.add(parser);
-            }
-        });
-        return Response.ok(feedResponses).build();
+        if (feeds.isEmpty()) throw new BadRequestException();
+        return Response.ok(parser.parse(user, feeds)).build();
     }
 
     private class MessageWrapper {
