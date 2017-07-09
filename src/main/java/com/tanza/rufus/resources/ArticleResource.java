@@ -54,7 +54,7 @@ public class ArticleResource {
     @Path("/frontpage")
     @GET
     public Response frontPage(@Auth User user) {
-        List<Article> articles = processor.buildArticleCollection(user, DEFAULT_DOCS_PER_FEED);
+        List<Article> articles = processor.buildFrontpageCollection(user, DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
     }
 
@@ -71,7 +71,7 @@ public class ArticleResource {
     @Path("/tagged")
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
-        List<Article> articles = processor.buildTagCollection(user, tag);
+        List<Article> articles = processor.buildTagCollection(user, tag, DEFAULT_DOCS_PER_FEED);
         return Response.ok(articles).build();
     }
 

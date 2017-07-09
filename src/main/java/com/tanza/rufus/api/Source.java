@@ -1,6 +1,7 @@
 package com.tanza.rufus.api;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 /**

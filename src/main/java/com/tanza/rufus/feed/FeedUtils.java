@@ -56,7 +56,7 @@ public class FeedUtils {
     }
 
     public static List<RufusFeed> sourceToFeed(List<Source> sources) {
-       return sources.stream().map(s -> RufusFeed.generate(s.getUrl(), s.getTags())).collect(Collectors.toList());
+       return sources.stream().map(s -> RufusFeed.generate(s)).collect(Collectors.toList());
     }
 
     /**

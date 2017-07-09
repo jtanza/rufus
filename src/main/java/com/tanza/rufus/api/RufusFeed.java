@@ -18,39 +18,39 @@ import java.util.List;
  */
 
 public class RufusFeed {
-    private final URL feedUrl;
+    private final Source source;
     private final SyndFeed feed;
-    private final List<String> tags;
 
-    private RufusFeed(URL feedUrl, SyndFeed feed, List<String> tags) {
-        this.feedUrl = feedUrl;
+    private RufusFeed(Source source, SyndFeed feed) {
         this.feed = feed;
-        this.tags = tags;
+        this.source = source;
     }
 
-    public static RufusFeed generate(URL url, List<String> tags) {
+    public static RufusFeed generate(Source source) {
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = null;
+        URL url = source.getUrl();
         try {
             feed = input.build(new XmlReader(url));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //never null
-        tags = CollectionUtils.isEmpty(tags) ? Collections.EMPTY_LIST : tags;
-        return new RufusFeed(url,feed, tags);
+
+        if (CollectionUtils.isEmpty(source.getTags())) {
+            source.setTags(Collections.EMPTY_LIST); //never null!
+        }
+
+        return new RufusFeed(source, feed);
     }
 
-    public URL getFeedUrl() {
-        return feedUrl;
+    public Source getSource() {
+        return source;
     }
 
     public SyndFeed getFeed() {
         return feed;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
 }
+
 

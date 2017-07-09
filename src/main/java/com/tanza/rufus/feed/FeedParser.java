@@ -6,7 +6,8 @@ import com.tanza.rufus.db.UserDao;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-import org.apache.commons.validator.routines.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,12 +21,14 @@ import java.util.stream.Collectors;
  */
 
 public class FeedParser {
-    private static final String[] SCHEMES = {"http", "https"};
+    private static final Logger logger = LoggerFactory.getLogger(FeedParser.class);
 
     private final UserDao userDao;
+    private final FeedProcessor processor;
 
-    public FeedParser(UserDao userDao) {
+    public FeedParser(UserDao userDao, FeedProcessor processor) {
         this.userDao = userDao;
+        this.processor = processor;
     }
 
     /**
@@ -37,8 +40,9 @@ public class FeedParser {
      * @return
      */
     public List<Response> parse(User user, List<String> requestFeeds) {
+        int userId = user.getId();
         Set<String> pruned = new HashSet<>(requestFeeds);
-        List<String> existing = userDao.getSources(user.getId()).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
+        List<String> existing = userDao.getSources(userId).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
 
         List<Response> feedResponses = new ArrayList<>();
         pruned.forEach((String f) -> {
@@ -47,31 +51,29 @@ public class FeedParser {
             } else {
                 Response parser = FeedParser.validate(f);
                 if (parser.isValid()) {
-                    userDao.addFeed(user.getId(), parser.getUrl());
+                    logger.info("added feed {} for user {}", f, userId);
+                    userDao.addFeed(userId, parser.getUrl());
                 }
                 feedResponses.add(parser);
             }
         });
+        processor.getArticleCache().invalidate(userId);
         return feedResponses;
     }
 
     public static Response validate(String feedRequestUrl) {
-        UrlValidator urlValidator = new UrlValidator(SCHEMES);
-        if (!urlValidator.isValid(feedRequestUrl)) {
-            return Response.invalid("Could not parse url : " + feedRequestUrl, feedRequestUrl);
-        }
         try {
             URL url = new URL(feedRequestUrl);
             SyndFeedInput input = new SyndFeedInput();
             input.build(new XmlReader(url)); //ensure request is a valid rss feed
             return Response.valid(feedRequestUrl);
         } catch (Exception e) {
+            logger.debug("could not parse feed request {}, reason {}", feedRequestUrl, e.getMessage());
             return Response.invalid(e.getMessage(), feedRequestUrl);
         }
     }
 
     public static class Response {
-
         private boolean valid;
         private String error;
         private String url;

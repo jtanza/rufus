@@ -50,7 +50,10 @@ public class FeedProcessor {
         return feedProcessor;
     }
 
-    //TODO cache invalidation if just a ttl proves insufficient
+    public LoadingCache<Integer, Map<Channel, List<Document>>> getArticleCache() {
+        return articleCache;
+    }
+
     public void init() {
         articleCache = CacheBuilder.newBuilder()
                 .maximumSize(MAX_CACHE)
@@ -66,40 +69,31 @@ public class FeedProcessor {
     }
 
     public List<Article> buildArticleCollection(User user) {
-        return loadArticles(user, false, 0);
+        return loadArticles(user, getChannels(user), false, 0);
     }
 
     public List<Article> buildArticleCollection(User user, int docsPerChannel) {
-        return loadArticles(user, true, docsPerChannel);
+        return loadArticles(user, getChannels(user), true, docsPerChannel);
     }
 
-    public List<Article> buildTagCollection(User user, String tag) {
-        int userId = user.getId();
-
-        Map<Channel, List<Document>> docMap;
-        try {
-            docMap = articleCache.get(userId);
-        } catch (ExecutionException e) {
-            logger.error("could not load cache for user {}, loading articles..", userId);
-            docMap = getCollection(userId);
-        }
-
-        Map<Channel, List<Document>> tagged = docMap.entrySet().stream()
-                .filter(e -> e.getKey().getTags().contains(tag))
+    public List<Article> buildTagCollection(User user, String tag, int docsPerChannel) {
+        Map<Channel, List<Document>> tagged = getChannels(user).entrySet().stream()
+                .filter(e -> e.getKey().getSource().getTags().contains(tag))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
-        List<Article> articles = new ArrayList<>();
-        tagged.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
-                .map(d -> Article.of(e.getKey(), d))
-                .collect(Collectors.toList())));
-
-        syncBookmarks(articles, articleDao.getBookmarked(userId));
-        return FeedUtils.sort(articles);
+        return loadArticles(user, tagged, true, docsPerChannel);
     }
 
-    private List<Article> loadArticles(User user, boolean limit, int docsPerChannel) {
-        int userId = user.getId();
+    public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
+        Map<Channel, List<Document>> tagged = getChannels(user).entrySet().stream()
+                .filter(e -> e.getKey().getSource().isFrontpage())
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
+        return loadArticles(user, tagged, true, docsPerChannel);
+    }
+
+    private Map<Channel, List<Document>> getChannels(User user) {
+        int userId = user.getId();
         Map<Channel, List<Document>> docMap;
         try {
             docMap = articleCache.get(userId);
@@ -107,17 +101,22 @@ public class FeedProcessor {
             logger.error("could not load cache for user {}, loading articles..", userId);
             docMap = getCollection(userId);
         }
+        return docMap;
+    }
+
+    private List<Article> loadArticles(User user, Map<Channel, List<Document>> channelMap, boolean limit, int docsPerChannel) {
+        int userId = user.getId();
 
         List<Article> articles = new ArrayList<>();
         Set<Article> bookmarks = articleDao.getBookmarked(userId);
 
         if (limit) {
-            docMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
+            channelMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
                     .limit(docsPerChannel)
                     .map(d -> Article.of(e.getKey(), d))
                     .collect(Collectors.toList())));
         } else {
-            docMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
+            channelMap.entrySet().forEach(e -> articles.addAll(e.getValue().stream()
                     .map(d -> Article.of(e.getKey(), d))
                     .collect(Collectors.toList())));
         }
@@ -127,7 +126,7 @@ public class FeedProcessor {
     }
 
     private Map<Channel, List<Document>> getCollection(int userId) {
-        List<Source> sources = userDao.getSources(userId).stream().filter(Source::isFrontpage).collect(Collectors.toList());
+        List<Source> sources = userDao.getSources(userId).stream().collect(Collectors.toList());
         List<RufusFeed> requests = FeedUtils.sourceToFeed(sources);
 
         return buildChannelMap(requests);
@@ -143,7 +142,7 @@ public class FeedProcessor {
         Map<Channel, List<Document>> ret = new HashMap<>();
         requests.forEach(r -> {
             Pair<SyndFeed, List<SyndEntry>> synd = generateFeedPair(r);
-            ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink(), r.getTags()), extractDocuments(synd, true));
+            ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink(), r.getSource()), extractDocuments(synd, true));
         });
         return ret;
     }
