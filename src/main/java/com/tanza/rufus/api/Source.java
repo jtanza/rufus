@@ -12,6 +12,8 @@ public class Source {
     private boolean frontpage;
     private List<String> tags;
 
+    public Source() {} //dummy jackson constructor
+
     public Source(URL url) {
         this.url = url;
     }

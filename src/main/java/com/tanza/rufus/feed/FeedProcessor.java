@@ -3,7 +3,6 @@ package com.tanza.rufus.feed;
 import com.tanza.rufus.api.*;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
-import com.tanza.rufus.db.UserDao;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -21,8 +20,7 @@ import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,21 +29,19 @@ import java.util.stream.Collectors;
 public class FeedProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FeedProcessor.class);
 
-    private static final int MAX_CACHE = 10_000;
+    private static final int MAX_CACHE = 1_000;
     private static final int TTL = 3;
 
-    private final UserDao userDao;
     private final ArticleDao articleDao;
 
     private LoadingCache<Integer, Map<Channel, List<Document>>> articleCache;
 
-    private FeedProcessor(UserDao userDao, ArticleDao articleDao) {
-        this.userDao = userDao;
+    private FeedProcessor(ArticleDao articleDao) {
         this.articleDao = articleDao;
     }
 
-    public static FeedProcessor newInstance(UserDao userDao, ArticleDao articleDao) {
-        FeedProcessor feedProcessor = new FeedProcessor(userDao, articleDao);
+    public static FeedProcessor newInstance(ArticleDao articleDao) {
+        FeedProcessor feedProcessor = new FeedProcessor(articleDao);
         feedProcessor.init();
         return feedProcessor;
     }
@@ -69,15 +65,15 @@ public class FeedProcessor {
     }
 
     public List<Article> buildArticleCollection(User user) {
-        return loadArticles(user, getChannels(user), false, 0);
+        return loadArticles(user, getChannelMap(user), false, 0);
     }
 
     public List<Article> buildArticleCollection(User user, int docsPerChannel) {
-        return loadArticles(user, getChannels(user), true, docsPerChannel);
+        return loadArticles(user, getChannelMap(user), true, docsPerChannel);
     }
 
     public List<Article> buildTagCollection(User user, String tag, int docsPerChannel) {
-        Map<Channel, List<Document>> tagged = getChannels(user).entrySet().stream()
+        Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
                 .filter(e -> e.getKey().getSource().getTags().contains(tag))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
@@ -85,23 +81,11 @@ public class FeedProcessor {
     }
 
     public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
-        Map<Channel, List<Document>> tagged = getChannels(user).entrySet().stream()
+        Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
                 .filter(e -> e.getKey().getSource().isFrontpage())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
         return loadArticles(user, tagged, true, docsPerChannel);
-    }
-
-    private Map<Channel, List<Document>> getChannels(User user) {
-        int userId = user.getId();
-        Map<Channel, List<Document>> docMap;
-        try {
-            docMap = articleCache.get(userId);
-        } catch (ExecutionException e) {
-            logger.error("could not load cache for user {}, loading articles..", userId);
-            docMap = getCollection(userId);
-        }
-        return docMap;
     }
 
     private List<Article> loadArticles(User user, Map<Channel, List<Document>> channelMap, boolean limit, int docsPerChannel) {
@@ -125,26 +109,33 @@ public class FeedProcessor {
         return FeedUtils.sort(articles);
     }
 
+    private Map<Channel, List<Document>> getChannelMap(User user) {
+        int userId = user.getId();
+        Map<Channel, List<Document>> docMap;
+        try {
+            docMap = articleCache.get(userId);
+        } catch (ExecutionException e) {
+            logger.error("could not load cache for user {}, loading articles..", userId);
+            docMap = getCollection(userId);
+        }
+        return docMap;
+    }
+
     private Map<Channel, List<Document>> getCollection(int userId) {
-        List<Source> sources = userDao.getSources(userId).stream().collect(Collectors.toList());
-        List<RufusFeed> requests = FeedUtils.sourceToFeed(sources);
-
-        return buildChannelMap(requests);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Pair<SyndFeed, List<SyndEntry>> generateFeedPair(RufusFeed request) {
-        SyndFeed feed = request.getFeed();
-        return ImmutablePair.of(feed, feed.getEntries());
-    }
-
-    private Map<Channel, List<Document>> buildChannelMap(List<RufusFeed> requests) {
-        Map<Channel, List<Document>> ret = new HashMap<>();
+        Map<Channel, List<Document>> ret = new ConcurrentHashMap<>();
+        List<Source> sources = articleDao.getSources(userId).stream().collect(Collectors.toList());
+        List<RufusFeed> requests = sources.stream().map(RufusFeed::generate).collect(Collectors.toList());
         requests.forEach(r -> {
-            Pair<SyndFeed, List<SyndEntry>> synd = generateFeedPair(r);
+            Pair<SyndFeed, List<SyndEntry>> synd =  buildFeedPair(r);
             ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink(), r.getSource()), extractDocuments(synd, true));
         });
         return ret;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Pair<SyndFeed, List<SyndEntry>> buildFeedPair(RufusFeed request) {
+        SyndFeed feed = request.getFeed();
+        return ImmutablePair.of(feed, feed.getEntries());
     }
 
     private static List<Document> extractDocuments(Pair<SyndFeed, List<SyndEntry>> feedEntry, boolean truncateDescriptions) {

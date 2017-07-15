@@ -1,6 +1,5 @@
 package com.tanza.rufus.resources;
 
-import com.sun.syndication.feed.atom.Feed;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
@@ -11,7 +10,8 @@ import com.tanza.rufus.feed.FeedProcessor;
 
 import io.dropwizard.auth.Auth;
 
-import com.codahale.metrics.annotation.Timed;
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,6 @@ public class ArticleResource {
         this.parser = parser;
     }
 
-    @Timed
     @Path("/frontpage")
     @GET
     public Response frontPage(@Auth User user) {
@@ -58,16 +57,13 @@ public class ArticleResource {
         return Response.ok(articles).build();
     }
 
-    @Timed
     @Path("/all")
-    @Produces("application/json")
     @GET
     public Response all(@Auth User user) {
         List<Article> articles = processor.buildArticleCollection(user);
         return Response.ok(articles).build();
     }
 
-    @Timed
     @Path("/tagged")
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
@@ -75,12 +71,11 @@ public class ArticleResource {
         return Response.ok(articles).build();
     }
 
-    @Timed
     @Path("/tagStubs")
     @GET
     public Response tagStubs(@Auth User user) {
         User u = userDao.findByEmail(user.getEmail());
-        Set<String> tags = userDao.getSources(u.getId()).stream()
+        Set<String> tags = articleDao.getSources(u.getId()).stream()
                 .map(Source::getTags)
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
@@ -89,24 +84,18 @@ public class ArticleResource {
         return Response.ok(tags).build();
     }
 
-    @Timed
     @Path("/bookmark")
-    @Consumes("application/json")
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response bookmark(@Auth User user, Article article) {
         User u = userDao.findByEmail(user.getEmail());
-
-        if (articleDao.getBookmarked(u.getId()).contains(article)) {
-            throw new BadRequestException("Article is already bookmarked!");
-        }
-
+        if (articleDao.getBookmarked(u.getId()).contains(article)) throw new BadRequestException("Article is already bookmarked!");
         articleDao.bookmarkArticle(u.getId(), article);
         return Response.ok().build();
     }
 
-    @Timed
     @Path("/isBookmarked")
-    @Consumes("application/json")
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response isBookmarked(@Auth User user, Article article) {
         User u = userDao.findByEmail(user.getEmail());
@@ -114,9 +103,8 @@ public class ArticleResource {
         return Response.ok(isBookmarked).build();
     }
 
-    @Timed
     @Path("/removeBookmark")
-    @Consumes("application/json")
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response removeBookmark(@Auth User user, Article article) {
         User u = userDao.findByEmail(user.getEmail());
@@ -124,7 +112,6 @@ public class ArticleResource {
         return Response.ok().build();
     }
 
-    @Timed
     @Path("/bookmarked")
     @GET
     public Response bookmarked(@Auth User user) {
@@ -133,12 +120,28 @@ public class ArticleResource {
         return Response.ok(bookmarked).build();
     }
 
-    @Timed
     @Path("/new")
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
         if (feeds.isEmpty()) throw new BadRequestException();
         return Response.ok(parser.parse(user, feeds)).build();
+    }
+
+    @Path("/frontpageNew")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    public Response addFrontpage(@Auth User user, Source source) {
+        if (StringUtils.isBlank(source.getUrl().toString())) throw new BadRequestException();
+        User u = userDao.findByEmail(user.getEmail());
+        articleDao.removeFrontpage(u.getId(), source);
+        return Response.ok().build();
+    }
+
+    @Path("sources")
+    @GET
+    public Response getSources(@Auth User user) {
+        User u = userDao.findByEmail(user.getEmail());
+        return Response.ok(articleDao.getSources(u.getId())).build();
     }
 
     private class MessageWrapper {

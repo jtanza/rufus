@@ -1,7 +1,7 @@
 package com.tanza.rufus.feed;
 
 import com.tanza.rufus.core.User;
-import com.tanza.rufus.db.UserDao;
+import com.tanza.rufus.db.ArticleDao;
 
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
@@ -23,17 +23,17 @@ import java.util.stream.Collectors;
 public class FeedParser {
     private static final Logger logger = LoggerFactory.getLogger(FeedParser.class);
 
-    private final UserDao userDao;
+    private final ArticleDao articleDao;
     private final FeedProcessor processor;
 
-    public FeedParser(UserDao userDao, FeedProcessor processor) {
-        this.userDao = userDao;
+    public FeedParser(ArticleDao articleDao, FeedProcessor processor) {
+        this.articleDao = articleDao;
         this.processor = processor;
     }
 
     /**
      * Validates and converts {@param requestFeeds} into
-     * an {@link URL}s
+     * {@link URL}s
      *
      * @param user
      * @param requestFeeds
@@ -42,7 +42,7 @@ public class FeedParser {
     public List<Response> parse(User user, List<String> requestFeeds) {
         int userId = user.getId();
         Set<String> pruned = new HashSet<>(requestFeeds);
-        List<String> existing = userDao.getSources(userId).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
+        List<String> existing = articleDao.getSources(userId).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
 
         List<Response> feedResponses = new ArrayList<>();
         pruned.forEach((String f) -> {
@@ -52,7 +52,7 @@ public class FeedParser {
                 Response parser = FeedParser.validate(f);
                 if (parser.isValid()) {
                     logger.info("added feed {} for user {}", f, userId);
-                    userDao.addFeed(userId, parser.getUrl());
+                    articleDao.addFeed(userId, parser.getUrl());
                 }
                 feedResponses.add(parser);
             }

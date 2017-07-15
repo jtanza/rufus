@@ -55,8 +55,9 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
-        final FeedProcessor processor = FeedProcessor.newInstance(userDao, articleDao);
-        final FeedParser parser = new FeedParser(userDao, processor);
+
+        final FeedProcessor processor = FeedProcessor.newInstance(articleDao);
+        final FeedParser parser = new FeedParser(articleDao, processor);
 
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(new UserResource(userDao));
