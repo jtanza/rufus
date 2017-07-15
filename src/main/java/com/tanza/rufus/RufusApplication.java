@@ -8,6 +8,7 @@ import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.resources.ArticleResource;
+import com.tanza.rufus.resources.PublicResource;
 import com.tanza.rufus.resources.UserResource;
 
 import io.dropwizard.Application;
@@ -15,14 +16,12 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
-import io.dropwizard.cli.EnvironmentCommand;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import net.sourceforge.argparse4j.inf.Namespace;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import org.skife.jdbi.v2.DBI;
@@ -61,6 +60,7 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(new UserResource(userDao));
+        env.jersey().register(new PublicResource(userDao, articleDao, processor));
 
         //route source
         env.jersey().setUrlPattern("/api/*");

@@ -1,6 +1,6 @@
 package com.tanza.rufus.db;
-
 import com.tanza.rufus.core.User;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -24,4 +24,8 @@ public interface UserDao {
 
     @SqlUpdate("insert into rufususer (ID, EMAIL) values (:id, :email)")
     void addUser(@BindBean User user);
+
+    @RegisterMapper(UserMapper.class)
+    @SqlQuery("select * from rufususer where email = 'public'")
+    User getPublicUser();
 }

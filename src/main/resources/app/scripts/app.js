@@ -54,7 +54,7 @@ app.config(function($routeProvider) {
     });
  }]);
 
- app.controller('homeController', ['$scope', '$route', '$http', '$location', function ($scope, $route, $http, $location) {
+app.controller('homeController', ['$scope', '$route', '$http', '$location', function ($scope, $route, $http, $location) {
     $http.get('api/articles/tagStubs').then(function(response) {
         $scope.tags = response.data;
     });
