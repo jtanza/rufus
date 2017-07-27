@@ -18,15 +18,14 @@ import java.util.List;
 /**
  * Created by jtanza.
  */
-public class ArticleMapper implements ResultSetMapper<Article>{
+public class ArticleMapper implements ResultSetMapper<Article> {
 
     @Override
     public Article map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
 
         Array articles = resultSet.getArray("authors");
         if (articles == null) {
-            //TODO refactor to return optional
-           throw new RuntimeException("No articles bookmarked!");
+            return null;
         }
 
         Date date = new Date(resultSet.getTimestamp("date").getTime());

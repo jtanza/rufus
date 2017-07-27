@@ -105,7 +105,7 @@ public class FeedProcessor {
                     .collect(Collectors.toList())));
         }
 
-        syncBookmarks(articles, bookmarks);
+        markBookmarks(articles, bookmarks);
         return FeedUtils.sort(articles);
     }
 
@@ -158,7 +158,7 @@ public class FeedProcessor {
         return ret;
     }
 
-    private void syncBookmarks(List<Article> articles, Set<Article> bookmarks) {
+    private void markBookmarks(List<Article> articles, Set<Article> bookmarks) {
         articles.stream().filter(bookmarks::contains).forEach(a -> a.setBookmark(true));
     }
 }
