@@ -2,6 +2,12 @@
     font-family: 'Source Sans Pro', sans-serif;
 }
 
+.inactive {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
+}
+
 .navbar-top {
     border: none;
     background-color: #fff;
@@ -31,9 +37,6 @@
 }
 #meta-nav li {
     display: inline;
-}
-#meta-nav a {
-    color: #000;
 }
 #meta-nav a:hover {
     text-decoration: none;
@@ -148,7 +151,6 @@ a:hover {
 .sidebar-nav li a {
     display: block;
     text-decoration: none;
-    color: #000;
 }
 .sidebar-nav li a:hover {
     text-decoration: none;
@@ -184,4 +186,5 @@ margin-top:30px;
 .login {
    font-family: 'Source Sans Pro', sans-serif;
 }
+
 

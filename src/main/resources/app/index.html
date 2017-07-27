@@ -20,7 +20,7 @@
         <div id="meta-nav">
             <ul>
                 <li><a href="#login">Login</a></li>
-                <li><a href="#settings">Settings</a></li>
+                <li><a href="#settings" ng-class="loggedin ? '' : 'inactive'">Settings</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="https://github.com/jtanza/rufus"><i class="fa fa-code-fork" aria-hidden="true"></i></a></li>
             </ul>
@@ -33,8 +33,8 @@
             <div class="sidebar-nav">
                 <div class="sidebar-list">
                     <li><a href="#frontpage"><i class="fa fa-newspaper-o" aria-hidden="true"></i>Front Page</a></li>
-                    <li><a href="#bookmarked"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
-                    <li><a href="#add"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
+                    <li><a href="#bookmarked" ng-class="loggedin ? '' : 'inactive'"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
+                    <li><a href="#add" ng-class="loggedin ? '' : 'inactive'"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
                     <li class="separator"></li>
                 </div>
                 <div class="sidebar-list">
