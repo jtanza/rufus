@@ -47,7 +47,8 @@ app.config(function($routeProvider) {
             templateUrl: 'pages/settings.html'
         })
         .when('/login', {
-            templateUrl: 'pages/login.html'
+            templateUrl: 'pages/login.html',
+            controller: 'loginController'
         })
         .when('/error', {
             templateUrl: 'pages/error.html'
@@ -121,4 +122,16 @@ app.controller('addFeedsController', function($scope, $http) {
             console.log(response);
         })
     };
+});
+
+app.controller('loginController', function($scope, $http) {
+    $scope.login = function () {
+        var user = {
+            email : $scope.username,
+            password : $scope.password
+        };
+        $http.post('api/user/login', user).then(function(response) {
+            console.log(response);
+        })
+    }
 });

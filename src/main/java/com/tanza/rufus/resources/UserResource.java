@@ -5,9 +5,13 @@ import com.tanza.rufus.core.Login;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.UserDao;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Optional;
@@ -26,10 +30,11 @@ public class UserResource {
     }
 
     @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public Response login(@FormParam("email") String email, @FormParam("password") String password) {
+    public Response login(User user) {
         BasicAuthenticator authenticator = new BasicAuthenticator(userDao);
-        Optional<User> user = authenticator.authenticate(email, password);
-        return user.isPresent() ? Response.ok().build() : Response.status(Status.UNAUTHORIZED).build();
+        Optional<User> res = authenticator.authenticate(user.getEmail(), user.getPassword());
+        return res.isPresent() ? Response.ok().build() : Response.status(Status.UNAUTHORIZED).build();
     }
 }
