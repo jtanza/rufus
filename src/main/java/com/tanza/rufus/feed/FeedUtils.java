@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +68,14 @@ public class FeedUtils {
      */
     public static String clean(String content) {
         return Jsoup.parse(StringEscapeUtils.unescapeHtml4(content)).text();
+    }
+
+    /**
+     * @param articles
+     * @param bookmarks
+     */
+    public static void markBookmarks(List<Article> articles, Set<Article> bookmarks) {
+        articles.stream().filter(bookmarks::contains).forEach(a -> a.setBookmark(true));
     }
 }
 

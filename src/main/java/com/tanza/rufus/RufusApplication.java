@@ -65,7 +65,6 @@ public class RufusApplication extends Application<RufusConfiguration> {
         //route source
         env.jersey().setUrlPattern("/api/*");
 
-
         //security
         env.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<User>()
                 .setAuthenticator(new BasicAuthenticator(userDao))
