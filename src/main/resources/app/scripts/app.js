@@ -1,14 +1,11 @@
-var app = angular.module('home', ['ngRoute', 'myLoginCheck']);
+var app = angular.module('home', ['ngRoute', 'myLoginCheck', 'ngCookies']);
 
-var login = angular.module('myLoginCheck', [])
-    .factory('$logincheck', function() {
-        return function(userid) {
-            // Perform logical user logging. Check either
-            // by looking at cookies or make a call to server.
-            if (userid > 0) return true;
-            return false;
-        };
-    });
+var login = angular.module('myLoginCheck', ['ngCookies'])
+    .factory('$logincheck', ['$cookies', function ($cookies) {
+        return function (user) {
+            return !!$cookies.get(user);
+        }
+    }]);
 
 app.config(function($routeProvider) {
     $routeProvider
@@ -57,7 +54,7 @@ app.config(function($routeProvider) {
 
  app.controller('resourceController', ['$scope', '$route', '$http', '$location', '$logincheck', function ($scope, $route, $http, $location, $logincheck) {
      var route = $route.current.$$route.resource;
-     if (!$logincheck(0)) {
+     if (!$logincheck($scope.username)) {
          $scope.loggedin = false;
          route = route.replace("articles", "public")
      }
@@ -130,8 +127,25 @@ app.controller('loginController', function($scope, $http) {
             email : $scope.username,
             password : $scope.password
         };
+        $http.defaults.headers.common['Authorization'] = 'Basic ' + $scope.username + ':' + $scope.password;
         $http.post('api/user/login', user).then(function(response) {
             console.log(response);
         })
     }
 });
+
+app.controller('loginController', ['$scope', '$http','$cookies', function($scope, $http, $cookies) {
+    $scope.login = function () {
+        var user = {
+            email : $scope.username,
+            password : $scope.password
+        };
+        $http.post('api/user/login', user).then(function success(response) {
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $scope.username + ':' + $scope.password;
+            $cookies.put($scope.username, true);
+        }, function error(response) {
+            $cookies.put($scope.username, false);
+            //TODO something about unsucessful login
+        });
+    };
+}]);
