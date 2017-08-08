@@ -22,6 +22,7 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import io.dropwizard.views.ViewBundle;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import org.skife.jdbi.v2.DBI;
@@ -38,13 +39,13 @@ public class RufusApplication extends Application<RufusConfiguration> {
     @Override
     public void initialize(Bootstrap<RufusConfiguration> bootstrap) {
         bootstrap.addBundle(new AssetsBundle("/app", "/", "index.html"));
+        bootstrap.addBundle(new ViewBundle<>());
         bootstrap.addBundle(new MigrationsBundle<RufusConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(RufusConfiguration conf) {
                 return conf.getDataSourceFactory();
             }
         });
-        bootstrap.addBundle(new AssetsBundle("/app", "/", "index.html"));
     }
 
     @Override

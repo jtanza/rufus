@@ -7,6 +7,7 @@ import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
+import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
@@ -51,17 +52,19 @@ public class ArticleResource {
     }
 
     @Path("/frontpage")
+    @Produces(MediaType.TEXT_HTML)
     @GET
-    public Response frontPage(@Auth User user) {
+    public ArticleView frontPage(@Auth User user) {
         List<Article> articles = processor.buildFrontpageCollection(user, DEFAULT_DOCS_PER_FEED);
-        return Response.ok(articles).build();
+        return new ArticleView(articles);
     }
 
     @Path("/all")
+    @Produces(MediaType.TEXT_HTML)
     @GET
-    public Response all(@Auth User user) {
+    public ArticleView all(@Auth User user) {
         List<Article> articles = processor.buildArticleCollection(user);
-        return Response.ok(articles).build();
+        return new ArticleView(articles);
     }
 
     @Path("/tagged")
