@@ -3,7 +3,6 @@
 
 <head>
     <title>Rufus</title>
-
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Pacifico|Source+Sans+Pro|Scope+One|Bungee+Shade" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -16,9 +15,9 @@
         <p class="navbar-text" id="navbar-title"><a href="#frontpage">Rufus</a></p>
         <div id="meta-nav">
             <ul>
-                <li><a href="#login">Login</a></li>
-                <li><a href="#settings">Settings</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="#!login">Login</a></li>
+                <li><a href="#!settings">Settings</a></li>
+                <li><a href="#!about">About</a></li>
                 <li><a href="https://github.com/jtanza/rufus"><i class="fa fa-code-fork" aria-hidden="true"></i></a></li>
             </ul>
         </div>
@@ -39,7 +38,12 @@
                     <li><a href=""><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
                         <ul class="sidebar-list">
                             <li class="sidebar-tags">
-                                <a href="#tagged/{{tag}}">{{tag}}</a>
+                                <div id="tags"></div>
+                                <script id="tags-template" type="x-tmpl-mustache">
+                                    {{#tags}}
+                                        <a href="#!tagged?{{.}}">{{.}}</a>
+                                    {{/tags}}
+                                </script>
                             </li>
                         </ul>
                 </div>
@@ -47,7 +51,7 @@
         </div>
         <div class="col-md-9">
             <div class="row">
-                <div id="articles"></div>
+                <div id="content"></div>
             </div>
         </div>
     </div>

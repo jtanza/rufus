@@ -54,24 +54,25 @@ public class ArticleResource {
     @Path("/frontpage")
     @Produces(MediaType.TEXT_HTML)
     @GET
-    public ArticleView frontPage(@Auth User user) {
+    public Response frontPage(@Auth User user) {
         List<Article> articles = processor.buildFrontpageCollection(user, DEFAULT_DOCS_PER_FEED);
-        return new ArticleView(articles);
+        return Response.ok(new ArticleView(articles)).build();
     }
 
     @Path("/all")
     @Produces(MediaType.TEXT_HTML)
     @GET
-    public ArticleView all(@Auth User user) {
+    public Response all(@Auth User user) {
         List<Article> articles = processor.buildArticleCollection(user);
-        return new ArticleView(articles);
+        return Response.ok(new ArticleView(articles)).build();
     }
 
     @Path("/tagged")
+    @Produces(MediaType.TEXT_HTML)
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
         List<Article> articles = processor.buildTagCollection(user, tag, DEFAULT_DOCS_PER_FEED);
-        return Response.ok(articles).build();
+        return Response.ok(new ArticleView(articles)).build();
     }
 
     @Path("/tagStubs")
@@ -83,7 +84,6 @@ public class ArticleResource {
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
-
         return Response.ok(tags).build();
     }
 
@@ -116,11 +116,12 @@ public class ArticleResource {
     }
 
     @Path("/bookmarked")
+    @Produces(MediaType.TEXT_HTML)
     @GET
     public Response bookmarked(@Auth User user) {
         User u = userDao.findByEmail(user.getEmail());
         Set<Article> bookmarked = articleDao.getBookmarked(u.getId());
-        return Response.ok(bookmarked).build();
+        return Response.ok(new ArticleView(bookmarked)).build();
     }
 
     @Path("/new")
@@ -136,7 +137,7 @@ public class ArticleResource {
     public Response addFrontpage(@Auth User user, Source source) {
         if (StringUtils.isBlank(source.getUrl().toString())) throw new BadRequestException();
         User u = userDao.findByEmail(user.getEmail());
-        articleDao.removeFrontpage(u.getId(), source);
+        articleDao.setFrontpage(u.getId(), source);
         return Response.ok().build();
     }
 
