@@ -38,24 +38,27 @@ public class PublicResource {
     }
 
     @Path("/frontpage")
+    @Produces(MediaType.TEXT_HTML)
     @GET
     public Response frontPage() {
         List<Article> articles = processor.buildFrontpageCollection(userDao.getPublicUser(), DEFAULT_DOCS_PER_FEED);
-        return Response.ok(articles).build();
+        return ArticleResource.buildArticles(articles);
     }
 
     @Path("/all")
+    @Produces(MediaType.TEXT_HTML)
     @GET
     public Response all() {
         List<Article> articles = processor.buildArticleCollection(userDao.getPublicUser());
-        return Response.ok(articles).build();
+        return ArticleResource.buildArticles(articles);
     }
 
     @Path("/tagged")
+    @Produces(MediaType.TEXT_HTML)
     @GET
     public Response byTag(@QueryParam("tag") String tag) {
         List<Article> articles = processor.buildTagCollection(userDao.getPublicUser(), tag, DEFAULT_DOCS_PER_FEED);
-        return Response.ok(articles).build();
+        return ArticleResource.buildArticles(articles);
     }
 
     @Path("/tagStubs")

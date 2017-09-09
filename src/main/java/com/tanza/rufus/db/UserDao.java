@@ -25,6 +25,7 @@ public interface UserDao {
     @SqlUpdate("insert into rufususer (ID, EMAIL) values (:id, :email)")
     void addUser(@BindBean User user);
 
+    //TODO hrmm
     @RegisterMapper(UserMapper.class)
     @SqlQuery("select * from rufususer where email = 'public'")
     User getPublicUser();

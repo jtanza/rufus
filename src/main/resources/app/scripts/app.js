@@ -1,6 +1,7 @@
 
 (function() {
 
+    //home grown http lib
     var http = function () {
         this.get = function (url, callback) {
             var request = new XMLHttpRequest();
@@ -15,6 +16,7 @@
                 }
             };
             request.open('GET', url);
+            //request.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
             request.send();
         }
     }; var client = new http();
@@ -23,8 +25,17 @@
         return document.getElementById(id);
     }
 
+    function clarifyUserResource(url) {
+        if (false) { //TODO check for login status of user
+            return url;
+        } else {
+           return url.replace('articles', 'public');
+        }
+    }
+
     function generateHTML(url, id) {
-        client.get(url, function (resp) {
+        var resource = clarifyUserResource(url);
+        client.get(resource, function (resp) {
             getId(id).innerHTML = resp;
         });
     }
@@ -33,7 +44,8 @@
     window.onload = function () {
         var template = getId('tags-template').innerHTML;
         Mustache.parse(template);
-        client.get('/api/articles/tagStubs', function (resp) {
+        var resource = clarifyUserResource('/api/articles/tagStubs');
+        client.get(resource, function (resp) {
             getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         });
     };

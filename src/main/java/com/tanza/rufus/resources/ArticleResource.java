@@ -85,6 +85,7 @@ public class ArticleResource {
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
+
         return Response.ok(tags).build();
     }
 
@@ -149,7 +150,7 @@ public class ArticleResource {
         return Response.ok(articleDao.getSources(u.getId())).build();
     }
 
-    private static Response buildArticles(Collection<Article> articles) {
+    static Response buildArticles(Collection<Article> articles) {
         if (articles.isEmpty() || FeedUtils.isNull(articles)) {
             return Response.ok(ArticleView.EMPTY).build();
         }
