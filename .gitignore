@@ -4,3 +4,7 @@ target/
 # Intellij Idea
 *.iml
 .idea/
+
+# Misc
+start_postgres.sh
+stop_postgres.sh

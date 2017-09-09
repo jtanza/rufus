@@ -7,6 +7,7 @@ import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
+import com.tanza.rufus.feed.FeedUtils;
 import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
@@ -56,7 +57,7 @@ public class ArticleResource {
     @GET
     public Response frontPage(@Auth User user) {
         List<Article> articles = processor.buildFrontpageCollection(user, DEFAULT_DOCS_PER_FEED);
-        return Response.ok(new ArticleView(articles)).build();
+        return buildArticles(articles);
     }
 
     @Path("/all")
@@ -64,7 +65,7 @@ public class ArticleResource {
     @GET
     public Response all(@Auth User user) {
         List<Article> articles = processor.buildArticleCollection(user);
-        return Response.ok(new ArticleView(articles)).build();
+        return buildArticles(articles);
     }
 
     @Path("/tagged")
@@ -72,7 +73,7 @@ public class ArticleResource {
     @GET
     public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
         List<Article> articles = processor.buildTagCollection(user, tag, DEFAULT_DOCS_PER_FEED);
-        return Response.ok(new ArticleView(articles)).build();
+        return buildArticles(articles);
     }
 
     @Path("/tagStubs")
@@ -121,7 +122,7 @@ public class ArticleResource {
     public Response bookmarked(@Auth User user) {
         User u = userDao.findByEmail(user.getEmail());
         Set<Article> bookmarked = articleDao.getBookmarked(u.getId());
-        return Response.ok(new ArticleView(bookmarked)).build();
+        return buildArticles(bookmarked);
     }
 
     @Path("/new")
@@ -148,17 +149,10 @@ public class ArticleResource {
         return Response.ok(articleDao.getSources(u.getId())).build();
     }
 
-    private class MessageWrapper {
-        private String message;
-
-        public MessageWrapper() {} //dummy jackson constructor
-
-        public MessageWrapper(String message) {
-            this.message = message;
+    private static Response buildArticles(Collection<Article> articles) {
+        if (articles.isEmpty() || FeedUtils.isNull(articles)) {
+            return Response.ok(ArticleView.EMPTY).build();
         }
-
-        public String getMessage() {
-            return message;
-        }
+        return Response.ok(ArticleView.ofArticles(articles)).build();
     }
 }

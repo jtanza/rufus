@@ -11,6 +11,7 @@ import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -76,6 +77,17 @@ public class FeedUtils {
      */
     public static void markBookmarks(List<Article> articles, Set<Article> bookmarks) {
         articles.stream().filter(bookmarks::contains).forEach(a -> a.setBookmark(true));
+    }
+
+    /**
+     * Determines whether or not an {@link Collection}
+     * contains <i>only</i> null elements
+     *
+     * @param collection
+     * @return
+     */
+    public static boolean isNull(Collection<?> collection) {
+        return collection.stream().allMatch(e -> e == null);
     }
 }
 

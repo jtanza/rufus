@@ -29,6 +29,7 @@
         });
     }
 
+    //load tags
     window.onload = function () {
         var template = getId('tags-template').innerHTML;
         Mustache.parse(template);
@@ -36,7 +37,6 @@
             getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         });
     };
-
 
     //app routing
     var router = new Navigo(null, true, '#!');
