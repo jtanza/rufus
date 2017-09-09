@@ -64,14 +64,26 @@ public class FeedProcessor {
                 );
     }
 
+    /**
+     * Loads all {@link Article}s a {@link User} may have
+     * access to within the system.
+     *
+     * @param user
+     * @return
+     */
     public List<Article> buildArticleCollection(User user) {
         return loadArticles(user, getChannelMap(user), false, 0);
     }
 
-    public List<Article> buildArticleCollection(User user, int docsPerChannel) {
-        return loadArticles(user, getChannelMap(user), true, docsPerChannel);
-    }
-
+    /**
+     * Loads {@link Article}s which from {@link Source}s
+     * matching the requested {@param tag}.
+     *
+     * @param user
+     * @param tag
+     * @param docsPerChannel
+     * @return
+     */
     public List<Article> buildTagCollection(User user, String tag, int docsPerChannel) {
         Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
                 .filter(e -> e.getKey().getSource().getTags().contains(tag))
@@ -80,6 +92,14 @@ public class FeedProcessor {
         return loadArticles(user, tagged, true, docsPerChannel);
     }
 
+    /**
+     * Generates a collection of {@link Article}s which have
+     * been denoted for display on the "Front Page" of the client.
+     *
+     * @param user
+     * @param docsPerChannel
+     * @return
+     */
     public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
         Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
                 .filter(e -> e.getKey().getSource().isFrontpage())
@@ -157,7 +177,5 @@ public class FeedProcessor {
         });
         return ret;
     }
-
-
 }
 
