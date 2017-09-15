@@ -18,31 +18,35 @@ import java.util.Set;
 public interface ArticleDao {
 
     @SqlQuery("select * from rufususer left outer join articles on rufususer.userid = articles.userid where rufususer.userid = :id")
-    Set<Article> getBookmarked(@Bind("id") int id);
+    Set<Article> getBookmarked(@Bind("id") long id);
 
     @SqlUpdate(
             "insert into articles(userid, title, date, description, url, channelTitle, channelUrl, authors)" +
             "values ((select userid from rufususer where userid = :id), :title, :date, :description, :url, :channelTitle, :channelUrl, :authors)"
     )
-    void bookmarkArticle(@Bind("id") int id, @BindArticle Article article);
+    void bookmarkArticle(@Bind("id") long id, @BindArticle Article article);
 
     @SqlUpdate("delete from articles where userid = :id and url = :url")
-    void removeArticle(@Bind("id") int id, @Bind("url") String url);
+    void removeArticle(@Bind("id") long id, @Bind("url") String url);
 
     @RegisterMapper(SourceMapper.class)
     @SqlQuery("select * from rufususer left outer join sources on rufususer.userid = sources.userid where rufususer.userid = :id")
-    List<Source> getSources(@Bind("id") int id);
+    List<Source> getSources(@Bind("id") long id);
+
+    @RegisterMapper(SourceMapper.class)
+    @SqlQuery("select * from public_sources")
+    List<Source> getPublicSources();
 
     @SqlUpdate("insert into sources(userid, source) values((select userid from rufususer where userid = :id), :source)")
-    void addFeed(@Bind("id") int id, @Bind("source") String source);
+    void addFeed(@Bind("id") long id, @Bind("source") String source);
 
     @RegisterMapper(SourceMapper.class)
     @SqlQuery("select * from sources where :tag = any (tags) and userid = :id")
-    List<Source> getSourcesByTag(@Bind("id") int id, @Bind("tag") String tag);
+    List<Source> getSourcesByTag(@Bind("id") long id, @Bind("tag") String tag);
 
     @SqlUpdate("update sources set frontpage = TRUE where source = :source")
-    void setFrontpage(@Bind("id") int id, @BindSource Source source);
+    void setFrontpage(@Bind("id") long id, @BindSource Source source);
 
     @SqlUpdate("update sources set frontpage = FALSE where source = :source")
-    void removeFrontpage(@Bind("id") int id, @BindSource Source source);
+    void removeFrontpage(@Bind("id") long id, @BindSource Source source);
 }

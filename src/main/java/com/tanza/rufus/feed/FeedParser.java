@@ -40,7 +40,7 @@ public class FeedParser {
      * @return
      */
     public List<Response> parse(User user, List<String> requestFeeds) {
-        int userId = user.getId();
+        long userId = user.getId();
         Set<String> pruned = new HashSet<>(requestFeeds);
         List<String> existing = articleDao.getSources(userId).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
 

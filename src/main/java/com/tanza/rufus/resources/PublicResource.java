@@ -4,7 +4,6 @@ import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
-import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedProcessor;
 
 import javax.ws.rs.GET;
@@ -21,18 +20,20 @@ import java.util.stream.Collectors;
 import static com.tanza.rufus.feed.FeedConstants.DEFAULT_DOCS_PER_FEED;
 
 /**
+ * Controller responsible for providing unauthenticated access
+ * to Public {@link Article}s, i.e. {@link Article}s which are presented
+ * to unauthenticated {@link User}s within the web application.
+ *
  * Created by jtanza.
  */
 @Path("/public")
 @Produces(MediaType.APPLICATION_JSON)
 public class PublicResource {
 
-    private final UserDao userDao;
     private final ArticleDao articleDao;
     private final FeedProcessor processor;
 
-    public PublicResource(UserDao userDao, ArticleDao articleDao, FeedProcessor processor) {
-        this.userDao = userDao;
+    public PublicResource(ArticleDao articleDao, FeedProcessor processor) {
         this.articleDao = articleDao;
         this.processor = processor;
     }
@@ -41,36 +42,32 @@ public class PublicResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response frontPage() {
-        List<Article> articles = processor.buildFrontpageCollection(userDao.getPublicUser(), DEFAULT_DOCS_PER_FEED);
-        return ArticleResource.buildArticles(articles);
+        return ArticleResource.buildArticles(processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
     }
 
     @Path("/all")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response all() {
-        List<Article> articles = processor.buildArticleCollection(userDao.getPublicUser());
-        return ArticleResource.buildArticles(articles);
+        return ArticleResource.buildArticles(processor.buildArticleCollection());
     }
 
     @Path("/tagged")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response byTag(@QueryParam("tag") String tag) {
-        List<Article> articles = processor.buildTagCollection(userDao.getPublicUser(), tag, DEFAULT_DOCS_PER_FEED);
-        return ArticleResource.buildArticles(articles);
+        return ArticleResource.buildArticles(processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
     }
 
     @Path("/tagStubs")
     @GET
     public Response tagStubs() {
-        User u = userDao.getPublicUser();
-        Set<String> tags = articleDao.getSources(u.getId()).stream()
-                .map(Source::getTags)
-                .filter(Objects::nonNull)
-                .flatMap(List::stream)
-                .collect(Collectors.toSet());
-
+        Set<String> tags = articleDao.getPublicSources()
+            .stream()
+            .map(Source::getTags)
+            .filter(Objects::nonNull)
+            .flatMap(List::stream)
+            .collect(Collectors.toSet());
         return Response.ok(tags).build();
     }
 }

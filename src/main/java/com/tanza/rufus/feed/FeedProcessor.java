@@ -29,12 +29,13 @@ import java.util.stream.Collectors;
 public class FeedProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FeedProcessor.class);
 
+    private static final long PUB_USER_KEY = Long.MIN_VALUE;
     private static final int MAX_CACHE = 1_000;
     private static final int TTL = 3;
 
     private final ArticleDao articleDao;
 
-    private LoadingCache<Integer, Map<Channel, List<Document>>> articleCache;
+    private LoadingCache<Long, Map<Channel, List<Document>>> articleCache;
 
     private FeedProcessor(ArticleDao articleDao) {
         this.articleDao = articleDao;
@@ -46,7 +47,7 @@ public class FeedProcessor {
         return feedProcessor;
     }
 
-    public LoadingCache<Integer, Map<Channel, List<Document>>> getArticleCache() {
+    public LoadingCache<Long, Map<Channel, List<Document>>> getArticleCache() {
         return articleCache;
     }
 
@@ -55,9 +56,9 @@ public class FeedProcessor {
                 .maximumSize(MAX_CACHE)
                 .expireAfterAccess(TTL, TimeUnit.MINUTES)
                 .build(
-                        new CacheLoader<Integer, Map<Channel, List<Document>>>() {
+                        new CacheLoader<Long, Map<Channel, List<Document>>>() {
                             @Override
-                            public Map<Channel, List<Document>> load(Integer userId) throws Exception {
+                            public Map<Channel, List<Document>> load(Long userId) throws Exception {
                                 return getCollection(userId);
                             }
                         }
@@ -72,11 +73,25 @@ public class FeedProcessor {
      * @return
      */
     public List<Article> buildArticleCollection(User user) {
-        return loadArticles(user, getChannelMap(user), false, 0);
+        long userId = user.getId();
+        return loadArticles(userId, getChannelMap(userId), false, 0);
     }
 
     /**
-     * Loads {@link Article}s which from {@link Source}s
+     * Loads all public {@link Article}s within the system, i.e.
+     * {@link Article}s which are used to populate the client on
+     * anonymous sessions.
+     *
+     * See {@link com.tanza.rufus.resources.PublicResource}
+     *
+     * @return
+     */
+    public List<Article> buildArticleCollection() {
+        return loadArticles(PUB_USER_KEY, getChannelMap(PUB_USER_KEY), false, 0);
+    }
+
+    /**
+     * Loads {@link Article}s from {@link Source}s
      * matching the requested {@param tag}.
      *
      * @param user
@@ -85,15 +100,32 @@ public class FeedProcessor {
      * @return
      */
     public List<Article> buildTagCollection(User user, String tag, int docsPerChannel) {
-        Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
+        long userId = user.getId();
+        Map<Channel, List<Document>> tagged =
+            getChannelMap(userId).entrySet().stream()
                 .filter(e -> e.getKey().getSource().getTags().contains(tag))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-        return loadArticles(user, tagged, true, docsPerChannel);
+        return loadArticles(userId, tagged, true, docsPerChannel);
     }
 
     /**
-     * Generates a collection of {@link Article}s which have
+     * Loads public {@link Article}s from public {@link Source}s
+     * matching the requested {@param tag}.
+     *
+     * @param tag
+     * @param docsPerChannel
+     * @return
+     */
+    public List<Article> buildTagCollection(String tag, int docsPerChannel) {
+        Map<Channel, List<Document>> tagged =
+            getChannelMap(PUB_USER_KEY).entrySet().stream()
+                .filter(e -> e.getKey().getSource().getTags().contains(tag))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        return loadArticles(PUB_USER_KEY, tagged, true, docsPerChannel);
+    }
+
+    /**
+     * Generates a collection of public {@link Article}s which have
      * been denoted for display on the "Front Page" of the client.
      *
      * @param user
@@ -101,16 +133,30 @@ public class FeedProcessor {
      * @return
      */
     public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
-        Map<Channel, List<Document>> tagged = getChannelMap(user).entrySet().stream()
+        long userId= user.getId();
+        Map<Channel, List<Document>> tagged =
+            getChannelMap(userId).entrySet().stream()
                 .filter(e -> e.getKey().getSource().isFrontpage())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-        return loadArticles(user, tagged, true, docsPerChannel);
+        return loadArticles(userId, tagged, true, docsPerChannel);
     }
 
-    private List<Article> loadArticles(User user, Map<Channel, List<Document>> channelMap, boolean limit, int docsPerChannel) {
-        int userId = user.getId();
 
+    /**
+     * Generates a collection of public {@link Article}s which have
+     * been denoted for display on the "Front Page" of the client.
+     *
+     * @param docsPerChannel
+     * @return
+     */
+    public List<Article> buildFrontpageCollection(int docsPerChannel) {
+        Map<Channel, List<Document>> tagged = getChannelMap(PUB_USER_KEY).entrySet().stream()
+            .filter(e -> e.getKey().getSource().isFrontpage())
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        return loadArticles(PUB_USER_KEY, tagged, true, docsPerChannel);
+    }
+
+    private List<Article> loadArticles(long userId, Map<Channel, List<Document>> channelMap, boolean limit, int docsPerChannel) {
         List<Article> articles = new ArrayList<>();
         Set<Article> bookmarks = articleDao.getBookmarked(userId);
 
@@ -129,8 +175,7 @@ public class FeedProcessor {
         return FeedUtils.sort(articles);
     }
 
-    private Map<Channel, List<Document>> getChannelMap(User user) {
-        int userId = user.getId();
+    private Map<Channel, List<Document>> getChannelMap(long userId) {
         Map<Channel, List<Document>> docMap;
         try {
             docMap = articleCache.get(userId);
@@ -141,13 +186,29 @@ public class FeedProcessor {
         return docMap;
     }
 
-    private Map<Channel, List<Document>> getCollection(int userId) {
+    private Map<Channel, List<Document>> getCollection(long userId) {
         Map<Channel, List<Document>> ret = new ConcurrentHashMap<>();
-        List<Source> sources = articleDao.getSources(userId).stream().collect(Collectors.toList());
-        List<RufusFeed> requests = sources.stream().map(RufusFeed::generate).collect(Collectors.toList());
+        List<RufusFeed> requests;
+
+        if (userId == PUB_USER_KEY) {
+            requests = articleDao.getPublicSources()
+                .stream().collect(Collectors.toList())
+                .stream().map(RufusFeed::generate).collect(Collectors.toList());
+
+        } else {
+            requests = articleDao.getSources(userId)
+                .stream().collect(Collectors.toList())
+                .stream().map(RufusFeed::generate).collect(Collectors.toList());
+        }
+
         requests.forEach(r -> {
             Pair<SyndFeed, List<SyndEntry>> synd =  buildFeedPair(r);
-            ret.put(Channel.of(synd.getKey().getTitle(), synd.getKey().getLanguage(), synd.getKey().getLink(), r.getSource()), extractDocuments(synd, true));
+            ret.put(Channel.of(
+                synd.getKey().getTitle(),
+                synd.getKey().getLanguage(),
+                synd.getKey().getLink(),
+                r.getSource()),
+                extractDocuments(synd, true));
         });
         return ret;
     }

@@ -7,7 +7,7 @@ import java.util.List;
  * Created by jtanza.
  */
 public class User implements Principal {
-    private int id;
+    private long id;
     private String email;
     private String password;
     private List<String> roles;
@@ -19,11 +19,11 @@ public class User implements Principal {
         return email;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
