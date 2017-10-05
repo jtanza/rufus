@@ -1,64 +1,98 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Rufus</title>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Pacifico|Source+Sans+Pro|Scope+One|Bungee+Shade" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/styles/custom.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <title>Your page title here :)</title>
+  <meta name="description" content="rufus">
+  <meta name="author" content="jtanza">
+  <!-- Mobile Specific Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Scope+One|Pacifico" rel="stylesheet">
+  <!-- CSS -->
+  <link href="/styles/custom.css" rel="stylesheet">
+  <link href="/dependencies/normalize.css" rel="stylesheet">
+  <link href="/dependencies/skeleton.css" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Favicon -->
+  <!--<link rel="icon" type="image/png" href="images/favicon.png">-->
 </head>
-
 <body>
-<nav class="navbar-top navbar navbar-default navbar-static-top">
+
+
+<div id="layout">
+  <!-- Menu toggle -->
+  <a href="#menu" id="menuLink" class="menu-link">
+    <!-- Hamburger icon -->
+    <span></span>
+  </a>
+
+  <div id="menu">
+    <div class="pure-menu">
+      <div class="sidebar-nav pure-menu-item">
+
+        <div class="pure menu-item responsive-sidebar">
+          <ul class="pure-menu-list">
+            <li><a href="#!login" class="pure-menu-link"><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
+            <li><a href="#!settings" class="pure-menu-link"><i class="fa fa-wrench" aria-hidden="true"></i>Settings</a></li>
+            <li><a href="https://github.com/jtanza/rufus" class="pure-menu-link"><i class="fa fa-github-alt" aria-hidden="true"></i>Source</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-list">
+          <ul class="pure-menu-list">
+            <li><a href="#!frontpage" class="pure-menu-link"><i class="fa fa-newspaper-o" aria-hidden="true"></i>Front Page</a></li>
+            <li><a href="#!bookmarked" class="pure-menu-link"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
+            <li><a href="#!all" class="pure-menu-link"><i class="fa fa-globe" aria-hidden="true"></i>All Feeds</a></li>
+            <li><a href="" class="pure-menu-link"><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
+          </ul>
+
+          <ul class="sidebar-list">
+            <li class="sidebar-tags">
+              <div id="tags"></div>
+              <script id="tags-template" type="x-tmpl-mustache">
+                  {{#tags}}
+                    <a href="#!tagged?{{.}}">{{.}}</a>
+                  {{/tags}}
+                 </script>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="main">
     <div class="container">
-        <p class="navbar-text" id="navbar-title"><a href="#frontpage">Rufus</a></p>
-        <div id="meta-nav">
-            <ul>
-                <li><a href="#!login">Login</a></li>
-                <li><a href="#!settings">Settings</a></li>
-                <li><a href="#!about">About</a></li>
-                <li><a href="https://github.com/jtanza/rufus"><i class="fa fa-code-fork" aria-hidden="true"></i></a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="sidebar-nav">
-                <div class="sidebar-list">
-                    <li><a href="#!frontpage"><i class="fa fa-newspaper-o" aria-hidden="true"></i>Front Page</a></li>
-                    <li><a href="#!bookmarked"><i class="fa fa-bookmark-o" aria-hidden="true"></i>Bookmarked</a></li>
-                    <li><a href="#!add"><i class="fa fa-plus-square-o" aria-hidden="true"></i>Add Feeds</a></li>
-                    <li class="separator"></li>
-                </div>
-                <div class="sidebar-list">
-                    <li><a href="#!all"><i class="fa fa-globe" aria-hidden="true"></i>All Feeds</a></li>
-                    <li><a href=""><i class="fa fa-folder-o" aria-hidden="true"></i>Collections</a></li>
-                        <ul class="sidebar-list">
-                            <li class="sidebar-tags">
-                                <div id="tags"></div>
-                                <script id="tags-template" type="x-tmpl-mustache">
-                                    {{#tags}}
-                                        <a href="#!tagged?{{.}}">{{.}}</a>
-                                    {{/tags}}
-                                </script>
-                            </li>
-                        </ul>
-                </div>
+      <div class="row">
+        <div class="twelve columns">
+          <div class="topnav" id="myTopnav">
+            <p class="navbar-text" id="navbar-title"><a href="#frontpage">Rufus</a></p>
+            <div class="topnav-links">
+              <a href="#!login">Login</a>
+              <a href="#!settings">Settings</a>
+              <a href="https://github.com/jtanza/rufus">Source</a>
+              <a href="javascript:void(0);" class="icon" onclick="toggle()">&#9776;</a>
             </div>
+          </div>
         </div>
-        <div class="col-md-9">
-            <div class="row">
-                <div id="content"></div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="container">
+      <div class="row">
+        <div id="content"></div>
+      </div>
+    </div>
+  </div>
 </div>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
 <script src="/dependencies/navigo.min.js"></script>
 <script src="/scripts/app.js"></script>
+
 </body>
 </html>

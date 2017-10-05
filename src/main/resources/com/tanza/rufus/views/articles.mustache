@@ -1,22 +1,21 @@
 {{#articles}}
-    <div class="col-md-8">
-        <div class="well well-sm article-content">
+    <div class="eight columns">
+        <div class="article-content">
             <div class="title">
                 <a class="bookmark">
                     <i class="fa fa-bookmark-o" aria-hidden="true"></i>
                 </a>
-                <p><a href={{url}}>{{title}}</a></p>
+                <h6><a href={{url}}>{{title}}</a></h6>
             </div>
             <div class="description">
                 <p>{{description}}</p>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="meta well well-sm">
-            <p><a href={{channelUrl}}>{{channelTitle}}</a></p>
-            <p>{{publicationDate}}</p>
-        </div>
+    <div class="three columns meta">
+        <p><em><a href={{channelUrl}}>{{channelTitle}}</a></em></p>
+        <p><em>{{publicationDate}}</em></p>
     </div>
 {{/articles}}
+
 

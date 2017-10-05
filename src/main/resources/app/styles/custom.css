@@ -7,16 +7,8 @@
 .navbar-top {
     border: none;
     background-color: #fff;
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Scope One', serif;
     margin-bottom: 5%;
-}
-#navbar-title {
-    color: #000;
-    font-size: 30px;
-    margin-bottom: 0px;
-    margin-top: 30px;
-    margin-bottom: -20px;
-    font-family: 'Pacifico', cursive;
 }
 
 #navbar-title a {
@@ -25,7 +17,7 @@
 
 #meta-nav {
     float: right;
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Scope One', serif;
     margin-top: 3%;
 }
 #meta-nav ul {
@@ -40,62 +32,30 @@
 }
 #logo-container {}
 
-
-/* search
-.article-search {
-    margin-bottom: 3%;
-    margin-left: 48%;
+#content {
+    margin-top: 10%;
 }
-
-#namanyay-search-btn {
-background-color: #fcfcfc;
-color:#000;
-padding:5px 10px;
-border:1px solid #000;
-border-radius:0px;
-font-family: 'Source Sans Pro', sans-serif;
-}
-
-#namanyay-search-box {
-background-color: #fcfcfc;
-padding:2px 10px;
-border:0 none;
-border:1px solid #000;
-width:160px;
-border-radius:0px;
-font-family: 'Source Sans Pro', sans-serif;
-color:#000;
-}
-*/
-
 
 .article-content {
-    background-color: #fcfcfc;
-    margin-bottom: 10px;
+    background-color: #ffffff;
+    margin-bottom: 8%;
     border: none;
     box-shadow: none;
 }
 .title {
-    font-size: 105%;
     font-family: 'Source Sans Pro', sans-serif;
 }
 .description {
     font-size: 90%;
     font-family: 'Scope One', serif;
-    /*font-family: 'Source Sans Pro', sans-serif;*/
 }
 .meta {
-    background-color: #fff;
-    font-size: 90%;
+    font-size: 80%;
     font-family: 'Source Sans Pro', sans-serif;
-    border-top: 1px solid #f3f3f3;
-    border-style: solid none none none;
-    border-radius: 0px;
-    box-shadow: none;
 }
 .bookmark {
     float: right;
-    margin-right: 2%;
+    padding-left: 2%;
 }
 .title a:hover {
     text-decoration: none;
@@ -103,16 +63,15 @@ color:#000;
 }
 a {
     color: #000;
+    text-decoration: none;
 }
 a:hover {
-    color: #000;
-    text-decoration: underline;
+    text-decoration: none;
+    color: #95bff0;
 }
 
 /*side bar nav*/
 .sidebar-nav {
-    float: left;
-    position: fixed;
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 90%;
 }
@@ -135,14 +94,14 @@ a:hover {
     border-bottom: 1px dotted #95bff0;
 }
 .sidebar-tags {
-    margin:-10px 0 -20px;
+    margin-top:-10px;
+    text-indent: 21%;
 }
 .sidebar-list {
     list-style: none;
 }
 .sidebar-nav li {
-    text-indent: 20px;
-    line-height: 40px;
+    line-height: 25px;
 }
 .sidebar-nav li a {
     display: block;
@@ -180,7 +139,265 @@ margin-top:30px;
 }
 
 .login {
+    font-family: 'Scope One', serif;
+}
+
+/* Nav */
+.topnav {
+    background-color: #fff;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    display: block;
+    width: 100%;
+    margin-bottom: 10%;
+}
+
+.topnav-links {
+    float: right;
+    margin: 2% 4% 2% 0;
+    text-decoration: none;
     font-family: 'Source Sans Pro', sans-serif;
+    display: block;
+    color: #000;
+    text-align: center;
+    font-size: 90%
+}
+
+.topnav-links a {
+    padding: 10px 5px;
+}
+
+.topnav-links a:hover {
+    color: #95bff0;
+}
+
+#navbar-title {
+    float:left;
+    color: #000;
+    font-size: 200%;
+    font-family: 'Pacifico', cursive;
+    margin: 1% 0 1% 4%;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+    display: none;
+}
+
+.responsive-sidebar {
+    display: none;
+    margin-bottom: 30%;
+}
+
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 48em) {
+    .topnav-links a {display: none;}
+    .topnav #navbar-title {
+        float: right;
+        margin-right: 10%;
+    }
+
+    #main .container {
+        margin-top: 10%;
+    }
+
+    .responsive-sidebar {
+        display: block;
+    }
+}
+
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+@media screen and (max-width: 48em) {
+    .topnav.responsive {position: relative;}
+    .topnav.responsive a.icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    .topnav.responsive a {
+        float: none;
+        display: block;
+        text-align: left;
+    }
 }
 
 
+/*Sidebar*/
+
+/*
+Add transition to containers so they can push in and out.
+*/
+#layout,
+#menu,
+.menu-link {
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -ms-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+}
+
+/*
+This is the parent `<div>` that contains the menu and the content area.
+*/
+#layout {
+    position: relative;
+    left: 0;
+    padding-left: 0;
+}
+#layout.active #menu {
+    left: 150px;
+    width: 150px;
+}
+
+#layout.active .menu-link {
+    left: 150px;
+}
+/*
+The content `<div>` is where all your content goes.
+*/
+.content {
+    padding: 0 2em;
+    max-width: 800px;
+    margin: 0 auto 50px;
+    line-height: 1.6em;
+}
+
+.content-subhead {
+    margin: 50px 0 20px 0;
+    font-weight: 300;
+    color: #888;
+}
+
+/*
+The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
+appears on the left side of the page.
+*/
+
+#menu {
+    margin-top: 10%;
+    margin-left: -150px;
+    width: 150px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000; /* so the menu or its navicon stays above all content */
+    background: transparent;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+/*
+All anchors inside the menu should be styled like this.
+*/
+#menu a {
+    color: #000;
+    border: none;
+}
+
+/*
+This styles a link within a selected menu item `<li>`.
+*/
+#menu .pure-menu-selected a {
+    color: #fff;
+}
+
+/*
+This styles the menu heading.
+*/
+#menu .pure-menu-heading {
+    font-size: 110%;
+    color: #fff;
+    margin: 0;
+}
+
+/*
+`.menu-link` represents the responsive menu toggle that shows/hides on
+small screens.
+*/
+.menu-link {
+    position: fixed;
+    display: block; /* show this only on small screens */
+    top: 0;
+    left: 0; /* "#menu width" */
+    background: #fff;
+    font-size: 10px; /* change this value to increase/decrease button size */
+    z-index: 100;
+    width: 2em;
+    height: auto;
+    padding: 2.1em 1.6em;
+}
+
+.menu-link span {
+    position: relative;
+    display: block;
+}
+
+.menu-link span,
+.menu-link span:before,
+.menu-link span:after {
+    background-color: #000;
+    width: 100%;
+    height: 0.2em;
+}
+
+.menu-link span:before,
+.menu-link span:after {
+    position: absolute;
+    margin-top: -0.6em;
+    content: " ";
+}
+
+.menu-link span:after {
+    margin-top: 0.6em;
+}
+
+
+/* -- Responsive Styles (Media Queries) ------------------------------------- */
+
+/*
+Hides the menu at `48em`, but modify this based on your app's needs.
+*/
+@media (min-width: 48em) {
+
+    .header,
+    .content {
+        padding-left: 2em;
+        padding-right: 2em;
+    }
+
+    #layout {
+        padding-left: 150px; /* left col width "#menu" */
+        left: 0;
+    }
+    #menu {
+        left: 150px;
+    }
+
+    .menu-link {
+        position: fixed;
+        left: 150px;
+        display: none;
+    }
+
+    #layout.active .menu-link {
+        left: 150px;
+    }
+
+}
+
+@media (max-width: 48em) {
+    /* Only apply this when the window is small. Otherwise, the following
+    case results in extra padding on the left:
+        * Make the window small.
+        * Tap the menu to trigger the active state.
+        * Make the window large again.
+    */
+    #layout.active {
+        position: relative;
+        left: 150px;
+    }
+}
