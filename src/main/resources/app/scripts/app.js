@@ -1,16 +1,3 @@
-
-//Toggle between adding and removing the "responsive" class to
-//topnav when the user clicks on the icon
-function toggle() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
-        x.className += " responsive";
-    } else {
-        x.className = "topnav";
-    }
-}
-
-
 (function() {
 
     //home grown http lib
@@ -23,7 +10,8 @@ function toggle() {
                         callback(request.responseText);
                     } else {
                         //TODO error handling for !200
-                        window.location.replace('#!error');
+                        //window.location.replace('#!error');
+                        error(request);
                     }
                 }
             };
@@ -62,8 +50,23 @@ function toggle() {
         });
     };
 
+    function error(errorResponse) {
+        client.get('pages/error.html', function (resp) {
+            Mustache.parse(resp);
+            getId('content').innerHTML = Mustache.render(resp, {
+                errCode: errorResponse.status, 
+                errMessage: errorResponse.statusText
+            });
+        });
+    }
+
     //app routing
     var router = new Navigo(null, true, '#!');
+
+    //root view
+    router.on(function () {
+        generateHTML('api/articles/frontpage', 'content');
+    });
     
     router.on({
         'frontpage' : () => {generateHTML('api/articles/frontpage', 'content')},
@@ -75,66 +78,13 @@ function toggle() {
         'add'       : () => {generateHTML('pages/addFeeds.html', 'content')},
         'error'     : () => {generateHTML('pages/error.html', 'content')}
     });
-
+    
     router.on('tagged', function (params, query) {
         generateHTML('api/articles/tagged?tag=' + query, 'content');
     }).resolve();
-
-    //root view
-    router.on(function () {
-        generateHTML('api/articles/frontpage', 'content');
-    });
-
+    
+    
     router.resolve();
 
 })();
-
-
-(function (window, document) {
-
-    var layout   = document.getElementById('layout'),
-        menu     = document.getElementById('menu'),
-        menuLink = document.getElementById('menuLink'),
-        content  = document.getElementById('main');
-
-    function toggleClass(element, className) {
-        var classes = element.className.split(/\s+/),
-            length = classes.length,
-            i = 0;
-
-        for(; i < length; i++) {
-            if (classes[i] === className) {
-                classes.splice(i, 1);
-                break;
-            }
-        }
-        // The className is not found
-        if (length === classes.length) {
-            classes.push(className);
-        }
-
-        element.className = classes.join(' ');
-    }
-
-    function toggleAll(e) {
-        var active = 'active';
-
-        e.preventDefault();
-        toggleClass(layout, active);
-        toggleClass(menu, active);
-        toggleClass(menuLink, active);
-    }
-
-    menuLink.onclick = function (e) {
-        toggleAll(e);
-    };
-
-    content.onclick = function(e) {
-        if (menu.className.indexOf('active') !== -1) {
-            toggleAll(e);
-        }
-    };
-
-}(this, this.document));
-
 
