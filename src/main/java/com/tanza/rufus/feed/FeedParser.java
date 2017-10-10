@@ -57,11 +57,11 @@ public class FeedParser {
                 feedResponses.add(parser);
             }
         });
-        processor.getArticleCache().invalidate(userId);
+        processor.invalidateCache(userId); //update the user's article cache after having added new sources
         return feedResponses;
     }
 
-    public static Response validate(String feedRequestUrl) {
+    private static Response validate(String feedRequestUrl) {
         try {
             URL url = new URL(feedRequestUrl);
             SyndFeedInput input = new SyndFeedInput();
@@ -73,7 +73,7 @@ public class FeedParser {
         }
     }
 
-    public static class Response {
+    private static class Response {
         private boolean valid;
         private String error;
         private String url;

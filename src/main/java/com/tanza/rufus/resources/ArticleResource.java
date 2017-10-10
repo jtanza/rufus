@@ -55,32 +55,44 @@ public class ArticleResource {
     @Path("/frontpage")
     @Produces(MediaType.TEXT_HTML)
     @GET
-    public Response frontPage(@Auth User user) {
-        List<Article> articles = processor.buildFrontpageCollection(user, DEFAULT_DOCS_PER_FEED);
-        return buildArticles(articles);
+    public Response frontPage(@Auth Optional<User> user) {
+        if (user.isPresent()) {
+            return articleView(processor.buildFrontpageCollection(user.get(), DEFAULT_DOCS_PER_FEED));
+        } else {
+            return articleView(processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
+        }
     }
 
     @Path("/all")
     @Produces(MediaType.TEXT_HTML)
     @GET
-    public Response all(@Auth User user) {
-        List<Article> articles = processor.buildArticleCollection(user);
-        return buildArticles(articles);
+    public Response all(@Auth Optional<User> user) {
+        if (user.isPresent()) {
+            return articleView(processor.buildArticleCollection(user.get()));
+        } else {
+            return articleView(processor.buildArticleCollection());
+        }
     }
 
     @Path("/tagged")
     @Produces(MediaType.TEXT_HTML)
     @GET
-    public Response byTag(@Auth User user, @QueryParam("tag") String tag) {
-        List<Article> articles = processor.buildTagCollection(user, tag, DEFAULT_DOCS_PER_FEED);
-        return buildArticles(articles);
+    public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
+        if (user.isPresent()) {
+            return articleView(processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
+        } else {
+            return articleView(processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
+        }
     }
 
     @Path("/tagStubs")
     @GET
-    public Response tagStubs(@Auth User user) {
-        User u = userDao.findByEmail(user.getEmail());
-        Set<String> tags = articleDao.getSources(u.getId()).stream()
+    public Response tagStubs(@Auth Optional<User> user) {
+        List<Source> sources = user.isPresent()
+            ? articleDao.getSources(userDao.findByEmail(user.get().getEmail()).getId())
+            : articleDao.getPublicSources();
+
+        Set<String> tags = sources.stream()
                 .map(Source::getTags)
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
@@ -93,18 +105,19 @@ public class ArticleResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response bookmark(@Auth User user, Article article) {
-        User u = userDao.findByEmail(user.getEmail());
-        if (articleDao.getBookmarked(u.getId()).contains(article)) throw new BadRequestException("Article is already bookmarked!");
-        articleDao.bookmarkArticle(u.getId(), article);
+        user = userDao.findByEmail(user.getEmail());
+        if (articleDao.getBookmarked(user.getId()).contains(article)) throw new BadRequestException("Article is already bookmarked!");
+        articleDao.bookmarkArticle(user.getId(), article);
         return Response.ok().build();
+
     }
 
     @Path("/isBookmarked")
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response isBookmarked(@Auth User user, Article article) {
-        User u = userDao.findByEmail(user.getEmail());
-        boolean isBookmarked = articleDao.getBookmarked(u.getId()).contains(article);
+        user = userDao.findByEmail(user.getEmail());
+        boolean isBookmarked = articleDao.getBookmarked(user.getId()).contains(article);
         return Response.ok(isBookmarked).build();
     }
 
@@ -112,8 +125,8 @@ public class ArticleResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response removeBookmark(@Auth User user, Article article) {
-        User u = userDao.findByEmail(user.getEmail());
-        articleDao.removeArticle(u.getId(), article.getUrl());
+        user = userDao.findByEmail(user.getEmail());
+        articleDao.removeArticle(user.getId(), article.getUrl());
         return Response.ok().build();
     }
 
@@ -121,9 +134,8 @@ public class ArticleResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response bookmarked(@Auth User user) {
-        User u = userDao.findByEmail(user.getEmail());
-        Set<Article> bookmarked = articleDao.getBookmarked(u.getId());
-        return buildArticles(bookmarked);
+        user = userDao.findByEmail(user.getEmail());
+        return articleView(articleDao.getBookmarked(user.getId()));
     }
 
     @Path("/new")
@@ -138,19 +150,19 @@ public class ArticleResource {
     @POST
     public Response addFrontpage(@Auth User user, Source source) {
         if (StringUtils.isBlank(source.getUrl().toString())) throw new BadRequestException();
-        User u = userDao.findByEmail(user.getEmail());
-        articleDao.setFrontpage(u.getId(), source);
+        user = userDao.findByEmail(user.getEmail());
+        articleDao.setFrontpage(user.getId(), source);
         return Response.ok().build();
     }
 
     @Path("sources")
     @GET
     public Response getSources(@Auth User user) {
-        User u = userDao.findByEmail(user.getEmail());
-        return Response.ok(articleDao.getSources(u.getId())).build();
+        user = userDao.findByEmail(user.getEmail());
+        return Response.ok(articleDao.getSources(user.getId())).build();
     }
 
-    static Response buildArticles(Collection<Article> articles) {
+    private static Response articleView(Collection<Article> articles) {
         if (articles.isEmpty() || FeedUtils.isNull(articles)) {
             return Response.ok(ArticleView.EMPTY).build();
         }

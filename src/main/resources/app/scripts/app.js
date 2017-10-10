@@ -9,14 +9,11 @@
                     if (request.status == 200) {
                         callback(request.responseText);
                     } else {
-                        //TODO error handling for !200
-                        //window.location.replace('#!error');
                         error(request);
                     }
                 }
             };
             request.open('GET', url);
-            //request.setRequestHeader("Authorization", "Basic " + btoa("username:password"));
             request.send();
         }
     }; var client = new http();
@@ -25,17 +22,8 @@
         return document.getElementById(id);
     }
 
-    function clarifyUserResource(url) {
-        if (false) { //TODO check for login status of user
-            return url;
-        } else {
-           return url.replace('articles', 'public');
-        }
-    }
-
     function generateHTML(url, id) {
-        var resource = clarifyUserResource(url);
-        client.get(resource, function (resp) {
+        client.get(url, function (resp) {
             getId(id).innerHTML = resp;
         });
     }
@@ -44,8 +32,7 @@
     window.onload = function () {
         var template = getId('tags-template').innerHTML;
         Mustache.parse(template);
-        var resource = clarifyUserResource('/api/articles/tagStubs');
-        client.get(resource, function (resp) {
+        client.get('api/articles/tagStubs', function (resp) {
             getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         });
     };
@@ -54,8 +41,7 @@
         client.get('pages/error.html', function (resp) {
             Mustache.parse(resp);
             getId('content').innerHTML = Mustache.render(resp, {
-                errCode: errorResponse.status, 
-                errMessage: errorResponse.statusText
+                errCode: errorResponse.status
             });
         });
     }

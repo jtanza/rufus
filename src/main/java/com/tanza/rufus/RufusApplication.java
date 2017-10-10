@@ -6,9 +6,8 @@ import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedParser;
-import com.tanza.rufus.feed.FeedProcessor;
+import com.tanza.rufus.feed.FeedProcessorImpl;
 import com.tanza.rufus.resources.ArticleResource;
-import com.tanza.rufus.resources.PublicResource;
 import com.tanza.rufus.resources.UserResource;
 
 import io.dropwizard.Application;
@@ -31,6 +30,7 @@ import org.skife.jdbi.v2.DBI;
  * Created by jtanza.
  */
 public class RufusApplication extends Application<RufusConfiguration> {
+    private static final String DB_SOURCE = "postgresql";
 
     public static void main(String[] args) throws Exception {
         new RufusApplication().run(args);
@@ -51,17 +51,16 @@ public class RufusApplication extends Application<RufusConfiguration> {
     @Override
     public void run(RufusConfiguration conf, Environment env) throws Exception {
         final DBIFactory factory = new DBIFactory();
-        final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), "postgresql");
+        final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), DB_SOURCE);
 
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
 
-        final FeedProcessor processor = FeedProcessor.newInstance(articleDao);
+        final FeedProcessorImpl processor = FeedProcessorImpl.newInstance(articleDao);
         final FeedParser parser = new FeedParser(articleDao, processor);
 
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(new UserResource(userDao));
-        env.jersey().register(new PublicResource(articleDao, processor));
 
         //route source
         env.jersey().setUrlPattern("/api/*");
