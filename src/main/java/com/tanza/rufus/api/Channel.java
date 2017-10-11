@@ -1,6 +1,12 @@
 package com.tanza.rufus.api;
 
+import com.sun.syndication.feed.synd.SyndFeed;
+
 /**
+ * Encapsulation of meta data pulled from a {@link SyndFeed}, used in
+ * combination with a {@link Document} to generate {@link Article}s
+ * on the client.
+ *
  * @author jtanza
  */
 public class Channel {

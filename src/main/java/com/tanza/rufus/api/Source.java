@@ -1,10 +1,18 @@
 package com.tanza.rufus.api;
 
+import com.tanza.rufus.core.User;
+import com.tanza.rufus.db.SourceMapper;
+
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 /**
+ * A {@link Source} is the internal representation of a web feed (RSS)
+ * that a {@link User} has subscribed to. Persisted to and parsed from
+ * the db via {@link SourceMapper}.
+ *
+ * e.g. http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+ *
  * Created by jtanza.
  */
 public class Source {
