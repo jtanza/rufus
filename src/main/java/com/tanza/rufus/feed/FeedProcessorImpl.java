@@ -64,12 +64,12 @@ public class FeedProcessorImpl implements FeedProcessor {
     @Override
     public List<Article> buildArticleCollection(User user) {
         long userId = user.getId();
-        return articlesFromChannelMap(userId, getChannelMap(userId));
+        return articlesFromChannelMap(userId, getChannelMap(userId), 0);
     }
 
     @Override
     public List<Article> buildArticleCollection() {
-        return articlesFromChannelMap(PUB_USER_KEY, getChannelMap(PUB_USER_KEY));
+        return articlesFromChannelMap(PUB_USER_KEY, getChannelMap(PUB_USER_KEY), 0);
     }
 
     @Override
@@ -113,29 +113,23 @@ public class FeedProcessorImpl implements FeedProcessor {
         articleCache.invalidate(userId);
     }
 
-    private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap) {
+    private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap, int articleLimit) {
         List<Article> articles = new ArrayList<>();
         Set<Article> bookmarks = articleDao.getBookmarked(userId);
 
-        channelMap.entrySet().forEach(e ->
-            articles.addAll(
-                e.getValue().stream().map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
-            )
-        );
-
-        FeedUtils.markBookmarks(articles, bookmarks);
-        return FeedUtils.sort(articles);
-    }
-
-    private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap, int maxDocsPerChannel) {
-        List<Article> articles = new ArrayList<>();
-        Set<Article> bookmarks = articleDao.getBookmarked(userId);
-
-        channelMap.entrySet().forEach(e ->
-            articles.addAll(
-                e.getValue().stream().limit(maxDocsPerChannel).map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
-            )
-        );
+        if (articleLimit > 0) {
+            channelMap.entrySet().forEach(e ->
+                articles.addAll(
+                    e.getValue().stream().limit(articleLimit).map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
+                )
+            );
+        } else {
+            channelMap.entrySet().forEach(e ->
+                articles.addAll(
+                    e.getValue().stream().map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
+                )
+            );
+        }
 
         FeedUtils.markBookmarks(articles, bookmarks);
         return FeedUtils.sort(articles);
