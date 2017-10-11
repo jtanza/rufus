@@ -1,18 +1,20 @@
 package com.tanza.rufus.core;
 
+import java.io.Serializable;
+
 /**
  * Created by jtanza.
  */
-public class Login {
+public class Credentials implements Serializable {
     private String email;
     private String password;
 
-    public Login(String email, String password) {
+    public Credentials() {}
+
+    public Credentials(String email, String password) {
         this.email = email;
         this.password = password;
     }
-
-    public Login() {} //constructor for jackson de/serialization
 
     public String getEmail() {
         return email;

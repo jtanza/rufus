@@ -1,7 +1,9 @@
 package com.tanza.rufus;
 
+import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import com.tanza.rufus.auth.BasicAuthenticator;
-import com.tanza.rufus.auth.BasicAuthorizer;
+import com.tanza.rufus.auth.JwtAuthenticator;
+import com.tanza.rufus.auth.TokenGenerator;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
@@ -14,7 +16,6 @@ import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
-import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -22,8 +23,10 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import io.dropwizard.views.ViewBundle;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.keys.HmacKey;
 import org.skife.jdbi.v2.DBI;
 
 /**
@@ -31,6 +34,8 @@ import org.skife.jdbi.v2.DBI;
  */
 public class RufusApplication extends Application<RufusConfiguration> {
     private static final String DB_SOURCE = "postgresql";
+    //TODO
+    private static final byte[] VERIFICATION_KEY = "super_secret_key_change_me_asap".getBytes();
 
     public static void main(String[] args) throws Exception {
         new RufusApplication().run(args);
@@ -59,18 +64,29 @@ public class RufusApplication extends Application<RufusConfiguration> {
         final FeedProcessorImpl processor = FeedProcessorImpl.newInstance(articleDao);
         final FeedParser parser = new FeedParser(articleDao, processor);
 
+        final JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+            .setAllowedClockSkewInSeconds(30)
+            .setRequireExpirationTime()
+            .setRequireSubject()
+            .setVerificationKey(new HmacKey(VERIFICATION_KEY))
+            .setRelaxVerificationKeyValidation() //TODO potentially remove
+            .build();
+
+        //resources
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
-        env.jersey().register(new UserResource(userDao));
+        env.jersey().register(new UserResource(new BasicAuthenticator(userDao), new TokenGenerator(VERIFICATION_KEY)));
 
         //route source
         env.jersey().setUrlPattern("/api/*");
 
-        //security
-        env.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<User>()
-                .setAuthenticator(new BasicAuthenticator(userDao))
-                .setAuthorizer(new BasicAuthorizer())
-                .setRealm("BASIC-AUTH-REALM").buildAuthFilter()));
-        env.jersey().register(RolesAllowedDynamicFeature.class);
+        //auth
         env.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+        env.jersey().register(new AuthDynamicFeature(new JwtAuthFilter.Builder<User>()
+            .setJwtConsumer(jwtConsumer)
+            .setRealm("realm")
+            .setPrefix("bearer")
+            .setAuthenticator(new JwtAuthenticator(userDao))
+            .buildAuthFilter()
+        ));
     }
 }
