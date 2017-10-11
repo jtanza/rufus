@@ -7,9 +7,7 @@ Rufus is a simple web based RSS reader written in Java 8 atop Dropwizard
 
 
 ## Screenshots
-
-![rufus](http://i.imgur.com/nTjoo9i.png)
-
+...
 
 ## Installation
 ...
