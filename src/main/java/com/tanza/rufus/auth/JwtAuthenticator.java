@@ -6,6 +6,7 @@ import com.tanza.rufus.db.UserDao;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.NumericDate;
 import org.jose4j.jwt.consumer.JwtContext;
 
 import java.util.Optional;
@@ -24,6 +25,9 @@ public class JwtAuthenticator implements Authenticator<JwtContext, User> {
     @Override
     public Optional<User> authenticate(JwtContext jwtContext) throws AuthenticationException {
         try {
+            if (jwtContext.getJwtClaims().getExpirationTime().isBefore(NumericDate.now())) {
+                return Optional.empty();
+            }
             User u = userDao.findByEmail(jwtContext.getJwtClaims().getSubject());
             return u != null ? Optional.of(u) : Optional.empty();
         } catch (MalformedClaimException e) {
