@@ -1,14 +1,12 @@
-
+authenticationCachePolicy: "maximumSize=10000, expireAfterAccess=10m"
 database:
-  # driverClass: org.h2.Driver
-  # url: jdbc:h2:./target/rufusdb 
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql:rufusdb
-
+  url: "jdbc:postgresql:rufusdb"
 logging:
-  level: INFO
   appenders:
-    - type: console
+    -
+      target: stdout
       threshold: ALL
       timeZone: UTC
-      target: stdout
+      type: console
+  level: INFO

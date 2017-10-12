@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Provides basic authentication against
- * access to {@link UserResource#login(Credentials)}.
+ * requests to {@link UserResource#login(Credentials)}.
  *
  * Created by jtanza.
  */

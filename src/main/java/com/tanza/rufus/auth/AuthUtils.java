@@ -26,7 +26,7 @@ public class AuthUtils {
     }
 
     /**
-     * Verifies a stored hashed password against a plaintext equivalent.
+     * Verifies a stored hashed {@link User} password against a potential plaintext equivalent.
      *
      * Utilizes jBCrypt
      *

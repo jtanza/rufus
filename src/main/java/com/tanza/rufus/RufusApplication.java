@@ -1,5 +1,6 @@
 package com.tanza.rufus;
 
+import com.github.toastshaman.dropwizard.auth.jwt.CachingJwtAuthenticator;
 import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import com.tanza.rufus.auth.BasicAuthenticator;
 import com.tanza.rufus.auth.JwtAuthenticator;
@@ -72,6 +73,12 @@ public class RufusApplication extends Application<RufusConfiguration> {
             .setRelaxVerificationKeyValidation() //TODO potentially remove
             .build();
 
+        final CachingJwtAuthenticator<User> cachingJwtAuthenticator = new CachingJwtAuthenticator<>(
+            env.metrics(),
+            new JwtAuthenticator(userDao),
+            conf.getAuthenticationCachePolicy()
+        );
+
         //resources
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(new UserResource(new BasicAuthenticator(userDao), new TokenGenerator(VERIFICATION_KEY)));
@@ -81,12 +88,13 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         //auth
         env.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
-        env.jersey().register(new AuthDynamicFeature(new JwtAuthFilter.Builder<User>()
-            .setJwtConsumer(jwtConsumer)
-            .setRealm("realm")
-            .setPrefix("bearer")
-            .setAuthenticator(new JwtAuthenticator(userDao))
-            .buildAuthFilter()
+        env.jersey().register(new AuthDynamicFeature(
+            new JwtAuthFilter.Builder<User>()
+                .setJwtConsumer(jwtConsumer)
+                .setRealm("realm")
+                .setPrefix("bearer")
+                .setAuthenticator(cachingJwtAuthenticator)
+                .buildAuthFilter()
         ));
     }
 }

@@ -1,18 +1,29 @@
 package com.tanza.rufus.auth;
 
+import com.tanza.rufus.core.User;
+
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.NumericDate;
+import org.jose4j.jwt.consumer.JwtContext;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 
 /**
- * Service responsible for generating valid JWT Tokens
+ * Service responsible for generating JWTs for use in {@link User}
+ * session auth.
  *
  * @author jtanza
  */
 public class TokenGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(TokenGenerator.class);
+
     private static final float TOKEN_EXPIRATION_IN_MINUTES = 60;
 
     private final byte[] tokenSecret;
@@ -36,6 +47,15 @@ public class TokenGenerator {
             return jws.getCompactSerialization();
         } catch (JoseException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isExpired(JwtContext context) {
+        try {
+            return context.getJwtClaims().getExpirationTime().isBefore(NumericDate.now());
+        } catch (MalformedClaimException e) {
+            logger.debug("failed to validate token {}", e);
+            return false;
         }
     }
 }
