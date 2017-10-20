@@ -23,6 +23,6 @@ public interface UserDao {
     @SqlQuery("select * from rufususer where EMAIL = :email")
     User findByEmail(@Bind("email") String email);
 
-    @SqlUpdate("insert into rufususer (ID, EMAIL) values (:id, :email)")
+    @SqlUpdate("insert into rufususer (ID, EMAIL, PASSWORD) values (:id, :email, :password)")
     void addUser(@BindBean User user);
 }

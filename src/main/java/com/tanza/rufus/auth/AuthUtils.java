@@ -16,8 +16,6 @@ public class AuthUtils {
      * Hash an {@link User}'s plaintext password for storage
      * in the db.
      *
-     * Utilizes jBCrypt
-     *
      * @param password
      * @return
      */
@@ -27,8 +25,6 @@ public class AuthUtils {
 
     /**
      * Verifies a stored hashed {@link User} password against a potential plaintext equivalent.
-     *
-     * Utilizes jBCrypt
      *
      * @param password
      * @param hash

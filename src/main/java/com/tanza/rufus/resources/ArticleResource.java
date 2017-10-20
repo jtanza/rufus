@@ -41,10 +41,10 @@ public class ArticleResource {
     private final FeedParser parser;
 
     public ArticleResource (
-            UserDao userDao,
-            ArticleDao articleDao,
-            FeedProcessor processor,
-            FeedParser parser
+        UserDao userDao,
+        ArticleDao articleDao,
+        FeedProcessor processor,
+        FeedParser parser
     ) {
         this.userDao = userDao;
         this.articleDao = articleDao;
@@ -109,7 +109,6 @@ public class ArticleResource {
         if (articleDao.getBookmarked(user.getId()).contains(article)) throw new BadRequestException("Article is already bookmarked!");
         articleDao.bookmarkArticle(user.getId(), article);
         return Response.ok().build();
-
     }
 
     @Path("/isBookmarked")
@@ -117,8 +116,7 @@ public class ArticleResource {
     @POST
     public Response isBookmarked(@Auth User user, Article article) {
         user = userDao.findByEmail(user.getEmail());
-        boolean isBookmarked = articleDao.getBookmarked(user.getId()).contains(article);
-        return Response.ok(isBookmarked).build();
+        return Response.ok(articleDao.getBookmarked(user.getId()).contains(article)).build();
     }
 
     @Path("/removeBookmark")

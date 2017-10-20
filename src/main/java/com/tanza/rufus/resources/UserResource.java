@@ -1,9 +1,12 @@
 package com.tanza.rufus.resources;
 
+import com.tanza.rufus.auth.AuthUtils;
 import com.tanza.rufus.auth.BasicAuthenticator;
 import com.tanza.rufus.auth.TokenGenerator;
 import com.tanza.rufus.core.Credentials;
+import com.tanza.rufus.core.NewUser;
 import com.tanza.rufus.core.User;
+import com.tanza.rufus.db.UserDao;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -22,10 +25,12 @@ public class UserResource {
 
     private final BasicAuthenticator authenticator;
     private final TokenGenerator tokenGenerator;
+    private final UserDao userDao;
 
-    public UserResource(BasicAuthenticator authenticator, TokenGenerator tokenGenerator) {
+    public UserResource(BasicAuthenticator authenticator, TokenGenerator tokenGenerator, UserDao userDao) {
         this.authenticator = authenticator;
         this.tokenGenerator = tokenGenerator;
+        this.userDao = userDao;
     }
 
     @Path("/login")
@@ -39,5 +44,17 @@ public class UserResource {
         } else {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+    }
+
+    @Path("/new")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    public Response newUser(NewUser newUser) {
+        if (!NewUser.validFields(newUser.getEmail(), newUser.getPassword())) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
+        userDao.addUser(new User(newUser.getEmail(), AuthUtils.hashPassword(newUser.getPassword())));
+        return Response.ok().build();
     }
 }

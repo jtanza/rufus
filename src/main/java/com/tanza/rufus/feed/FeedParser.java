@@ -73,7 +73,7 @@ public class FeedParser {
         }
     }
 
-    private static class Response {
+    public static class Response {
         private boolean valid;
         private String error;
         private String url;

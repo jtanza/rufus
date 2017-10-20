@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.Objects;
 /**
  * @author jtanza
  */
-public class Article {
+public class Article implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String title;
     private Date publicationDate;

@@ -3,6 +3,7 @@ package com.tanza.rufus.api;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.SourceMapper;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
 
@@ -15,7 +16,9 @@ import java.util.List;
  *
  * Created by jtanza.
  */
-public class Source {
+public class Source implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private URL url;
     private boolean frontpage;
     private List<String> tags;

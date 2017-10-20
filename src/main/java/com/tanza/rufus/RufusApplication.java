@@ -81,7 +81,7 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         //resources
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
-        env.jersey().register(new UserResource(new BasicAuthenticator(userDao), new TokenGenerator(VERIFICATION_KEY)));
+        env.jersey().register(new UserResource(new BasicAuthenticator(userDao), new TokenGenerator(VERIFICATION_KEY), userDao));
 
         //route source
         env.jersey().setUrlPattern("/api/*");

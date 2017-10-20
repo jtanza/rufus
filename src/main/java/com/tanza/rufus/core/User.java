@@ -1,17 +1,25 @@
 package com.tanza.rufus.core;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 
 /**
  * Created by jtanza.
  */
-public class User implements Principal {
+public class User implements Principal, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private String email;
     private String password;
 
     public User() {} //dummy jackson constructor
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     @Override
     public String getName() {
