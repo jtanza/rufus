@@ -11,6 +11,8 @@ import com.google.common.cache.LoadingCache;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,6 +26,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
+ *
  * @author jtanza
  */
 public class FeedProcessorImpl implements FeedProcessor {
@@ -93,7 +96,7 @@ public class FeedProcessorImpl implements FeedProcessor {
 
     @Override
     public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
-        long userId= user.getId();
+        long userId = user.getId();
         Map<Channel, List<Document>> frontpage = getChannelMap(userId).entrySet().stream()
                 .filter(e -> e.getKey().getSource().isFrontpage())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
@@ -114,6 +117,10 @@ public class FeedProcessorImpl implements FeedProcessor {
     }
 
     private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap, int articleLimit) {
+        if (MapUtils.isEmpty(channelMap)) {
+            return Collections.emptyList();
+        }
+
         List<Article> articles = new ArrayList<>();
         Set<Article> bookmarks = articleDao.getBookmarked(userId);
 
@@ -157,9 +164,14 @@ public class FeedProcessorImpl implements FeedProcessor {
                 .stream().map(RufusFeed::generate).collect(Collectors.toList());
 
         } else {
-            requests = articleDao.getSources(userId)
+            List<Source> sources = articleDao.getSources(userId);
+            if (CollectionUtils.isEmpty(sources)) {
+                return Collections.emptyMap();
+            }
+            requests = sources
                 .stream().collect(Collectors.toList())
-                .stream().map(RufusFeed::generate).collect(Collectors.toList());
+                .stream().map(RufusFeed::generate)
+                .collect(Collectors.toList());
         }
 
         requests.forEach(r -> {

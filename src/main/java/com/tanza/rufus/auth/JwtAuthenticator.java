@@ -26,7 +26,7 @@ public class JwtAuthenticator implements Authenticator<JwtContext, User> {
      * i.e. this method is called after signature verification.
      *
      * //TODO potentially blacklist tokens here until their expiry if a user has
-     * //logged out &or changed her password.
+     * //TODO logged out &or changed her password.
      *
      * @param jwtContext
      * @return

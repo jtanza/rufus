@@ -39,57 +39,57 @@ public class FeedParser {
      * @param requestFeeds
      * @return
      */
-    public List<Response> parse(User user, List<String> requestFeeds) {
+    public List<FeedResponse> parse(User user, List<String> requestFeeds) {
         long userId = user.getId();
         Set<String> pruned = new HashSet<>(requestFeeds);
         List<String> existing = articleDao.getSources(userId).stream().map(s -> s.getUrl().toString()).collect(Collectors.toList());
 
-        List<Response> feedResponses = new ArrayList<>();
+        List<FeedResponse> feedFeedResponses = new ArrayList<>();
         pruned.forEach((String f) -> {
             if (existing.contains(f)) {
-                feedResponses.add(Response.invalid("Already Subscribed to Feed!", f));
+                feedFeedResponses.add(FeedResponse.invalid("Already Subscribed to Feed!", f));
             } else {
-                Response parser = FeedParser.validate(f);
+                FeedResponse parser = FeedParser.validate(f);
                 if (parser.isValid()) {
                     logger.info("added feed {} for user {}", f, userId);
                     articleDao.addFeed(userId, parser.getUrl());
                 }
-                feedResponses.add(parser);
+                feedFeedResponses.add(parser);
             }
         });
         processor.invalidateCache(userId); //update the user's article cache after having added new sources
-        return feedResponses;
+        return feedFeedResponses;
     }
 
-    private static Response validate(String feedRequestUrl) {
+    private static FeedResponse validate(String feedRequestUrl) {
         try {
             URL url = new URL(feedRequestUrl);
             SyndFeedInput input = new SyndFeedInput();
             input.build(new XmlReader(url)); //ensure request is a valid rss feed
-            return Response.valid(feedRequestUrl);
+            return FeedResponse.valid(feedRequestUrl);
         } catch (Exception e) {
             logger.debug("could not parse feed request {}, reason {}", feedRequestUrl, e.getMessage());
-            return Response.invalid(e.getMessage(), feedRequestUrl);
+            return FeedResponse.invalid(e.getMessage(), feedRequestUrl);
         }
     }
 
-    public static class Response {
+    public static class FeedResponse {
         private boolean valid;
         private String error;
         private String url;
 
-        private Response(boolean valid, String error, String url) {
+        private FeedResponse(boolean valid, String error, String url) {
             this.valid = valid;
             this.error = error;
             this.url = url;
         }
 
-        public static Response valid(String url) {
-            return new Response(true, null, url);
+        public static FeedResponse valid(String url) {
+            return new FeedResponse(true, null, url);
         }
 
-        public static Response invalid(String error, String url) {
-            return new Response(false, error, url);
+        public static FeedResponse invalid(String error, String url) {
+            return new FeedResponse(false, error, url);
         }
 
         public boolean isValid() {

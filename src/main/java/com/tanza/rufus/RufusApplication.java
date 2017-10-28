@@ -18,6 +18,7 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -46,6 +47,7 @@ public class RufusApplication extends Application<RufusConfiguration> {
     public void initialize(Bootstrap<RufusConfiguration> bootstrap) {
         bootstrap.addBundle(new AssetsBundle("/app", "/", "index.html"));
         bootstrap.addBundle(new ViewBundle<>());
+        bootstrap.addBundle(new MultiPartBundle());
         bootstrap.addBundle(new MigrationsBundle<RufusConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(RufusConfiguration conf) {
@@ -56,15 +58,18 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
     @Override
     public void run(RufusConfiguration conf, Environment env) throws Exception {
+        //db
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), DB_SOURCE);
 
+        //daos
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
 
         final FeedProcessorImpl processor = FeedProcessorImpl.newInstance(articleDao);
         final FeedParser parser = new FeedParser(articleDao, processor);
 
+        //jwt config
         final JwtConsumer jwtConsumer = new JwtConsumerBuilder()
             .setAllowedClockSkewInSeconds(30)
             .setRequireExpirationTime()
@@ -72,7 +77,6 @@ public class RufusApplication extends Application<RufusConfiguration> {
             .setVerificationKey(new HmacKey(VERIFICATION_KEY))
             .setRelaxVerificationKeyValidation() //TODO potentially remove
             .build();
-
         final CachingJwtAuthenticator<User> cachingJwtAuthenticator = new CachingJwtAuthenticator<>(
             env.metrics(),
             new JwtAuthenticator(userDao),
@@ -81,7 +85,14 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
         //resources
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
-        env.jersey().register(new UserResource(new BasicAuthenticator(userDao), new TokenGenerator(VERIFICATION_KEY), userDao));
+        env.jersey().register(
+            new UserResource(
+                new BasicAuthenticator(userDao),
+                new TokenGenerator(VERIFICATION_KEY),
+                userDao,
+                articleDao
+            )
+        );
 
         //route source
         env.jersey().setUrlPattern("/api/*");

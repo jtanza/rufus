@@ -1,8 +1,7 @@
 package com.tanza.rufus.core;
 
-import org.apache.commons.validator.routines.EmailValidator;
-
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author jtanza
@@ -12,6 +11,7 @@ public class NewUser implements Serializable {
 
     private String email;
     private String password;
+    private List<String> starterFeeds;
 
     public NewUser() {}
 
@@ -19,11 +19,23 @@ public class NewUser implements Serializable {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    public static boolean validFields(String email, String password) {
-        return EmailValidator.getInstance().isValid(email) && password != null;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<String> getStarterFeeds() {
+        return starterFeeds;
+    }
+
+    public void setStarterFeeds(List<String> starterFeeds) {
+        this.starterFeeds = starterFeeds;
     }
 }

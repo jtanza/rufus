@@ -1,6 +1,5 @@
 package com.tanza.rufus.auth;
 
-import com.tanza.rufus.core.Credentials;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.resources.UserResource;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 /**
  * Provides basic authentication against
- * requests to {@link UserResource#login(Credentials)}.
+ * requests to {@link UserResource#login(String, String)}.
  *
  * Created by jtanza.
  */

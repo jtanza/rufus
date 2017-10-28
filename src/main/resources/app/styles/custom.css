@@ -216,3 +216,8 @@ margin: 30px 0 30px 0;
     .menu_bar ul {padding: 0;}
 }
 
+.nowrap {
+    white-space: nowrap;
+    font-size: 90%;
+}
+

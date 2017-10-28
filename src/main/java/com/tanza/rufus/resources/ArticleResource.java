@@ -12,6 +12,7 @@ import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.tanza.rufus.feed.FeedConstants.*;
@@ -57,7 +59,8 @@ public class ArticleResource {
     @GET
     public Response frontPage(@Auth Optional<User> user) {
         if (user.isPresent()) {
-            return articleView(processor.buildFrontpageCollection(user.get(), DEFAULT_DOCS_PER_FEED));
+            User existing = user.get();
+            return articleView(existing, () -> processor.buildFrontpageCollection(existing, DEFAULT_DOCS_PER_FEED));
         } else {
             return articleView(processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
         }
@@ -68,7 +71,8 @@ public class ArticleResource {
     @GET
     public Response all(@Auth Optional<User> user) {
         if (user.isPresent()) {
-            return articleView(processor.buildArticleCollection(user.get()));
+            User existing = user.get();
+            return articleView(existing, () -> processor.buildArticleCollection(existing));
         } else {
             return articleView(processor.buildArticleCollection());
         }
@@ -79,7 +83,8 @@ public class ArticleResource {
     @GET
     public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
         if (user.isPresent()) {
-            return articleView(processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
+            User existing = user.get();
+            return articleView(existing, () -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
         } else {
             return articleView(processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
         }
@@ -91,6 +96,10 @@ public class ArticleResource {
         List<Source> sources = user.isPresent()
             ? articleDao.getSources(userDao.findByEmail(user.get().getEmail()).getId())
             : articleDao.getPublicSources();
+
+        if (CollectionUtils.isEmpty(sources)) {
+            return Response.ok().build();
+        }
 
         Set<String> tags = sources.stream()
                 .map(Source::getTags)
@@ -106,7 +115,9 @@ public class ArticleResource {
     @POST
     public Response bookmark(@Auth User user, Article article) {
         user = userDao.findByEmail(user.getEmail());
-        if (articleDao.getBookmarked(user.getId()).contains(article)) throw new BadRequestException("Article is already bookmarked!");
+        if (articleDao.getBookmarked(user.getId()).contains(article)) {
+            throw new BadRequestException("Article is already bookmarked!");
+        }
         articleDao.bookmarkArticle(user.getId(), article);
         return Response.ok().build();
     }
@@ -132,14 +143,16 @@ public class ArticleResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response bookmarked(@Auth User user) {
-        user = userDao.findByEmail(user.getEmail());
-        return articleView(articleDao.getBookmarked(user.getId()));
+        final User u = userDao.findByEmail(user.getEmail());
+        return articleView(user, () -> articleDao.getBookmarked(u.getId()));
     }
 
     @Path("/new")
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
-        if (feeds.isEmpty()) throw new BadRequestException();
+        if (feeds.isEmpty()) {
+            throw new BadRequestException();
+        }
         return Response.ok(parser.parse(user, feeds)).build();
     }
 
@@ -147,7 +160,9 @@ public class ArticleResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response addFrontpage(@Auth User user, Source source) {
-        if (StringUtils.isBlank(source.getUrl().toString())) throw new BadRequestException();
+        if (StringUtils.isBlank(source.getUrl().toString())) {
+            throw new BadRequestException();
+        }
         user = userDao.findByEmail(user.getEmail());
         articleDao.setFrontpage(user.getId(), source);
         return Response.ok().build();
@@ -160,10 +175,17 @@ public class ArticleResource {
         return Response.ok(articleDao.getSources(user.getId())).build();
     }
 
-    private static Response articleView(Collection<Article> articles) {
+    private Response articleView(Collection<Article> articles) {
         if (articles.isEmpty() || FeedUtils.isNull(articles)) {
             return Response.ok(ArticleView.EMPTY).build();
         }
         return Response.ok(ArticleView.ofArticles(articles)).build();
+    }
+
+    private Response articleView(User user, Supplier<Collection<Article>> articleSupplier) {
+        Collection<Article> articles = articleDao.hasSubscriptions(user.getId())
+            ? articleSupplier.get()
+            : Collections.EMPTY_LIST;
+        return articleView(articles);
     }
 }

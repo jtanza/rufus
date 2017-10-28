@@ -4,13 +4,9 @@ import com.tanza.rufus.api.Article;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -22,14 +18,8 @@ public class ArticleMapper implements ResultSetMapper<Article> {
 
     @Override
     public Article map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
-
-        Array articles = resultSet.getArray("authors");
-        if (articles == null) {
-            return null;
-        }
-
         Date date = new Date(resultSet.getTimestamp("date").getTime());
-        List<String> authors = Arrays.asList((String[]) articles.getArray());
+        List<String> authors = Arrays.asList((String[]) resultSet.getArray("authors").getArray());
 
         Article article = new Article (
                 resultSet.getString("title"),

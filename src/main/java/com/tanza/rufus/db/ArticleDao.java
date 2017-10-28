@@ -49,4 +49,7 @@ public interface ArticleDao {
 
     @SqlUpdate("update sources set frontpage = FALSE where source = :source")
     void removeFrontpage(@Bind("id") long id, @BindSource Source source);
+
+    @SqlQuery("select count(source) > 0 from rufususer left outer join sources on rufususer.userid = sources.userid where rufususer.userid = :id")
+    boolean hasSubscriptions(@Bind("id") long id);
 }

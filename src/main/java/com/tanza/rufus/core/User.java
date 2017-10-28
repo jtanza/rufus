@@ -2,7 +2,6 @@ package com.tanza.rufus.core;
 
 import java.io.Serializable;
 import java.security.Principal;
-import java.util.List;
 
 /**
  * Created by jtanza.
@@ -14,7 +13,7 @@ public class User implements Principal, Serializable {
     private String email;
     private String password;
 
-    public User() {} //dummy jackson constructor
+    public User() {} //jackson
 
     public User(String email, String password) {
         this.email = email;

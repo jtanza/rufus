@@ -24,7 +24,7 @@ import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 public class TokenGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TokenGenerator.class);
 
-    private static final float TOKEN_EXPIRATION_IN_MINUTES = 60;
+    private static final float TOKEN_EXPIRATION_IN_MINUTES = 180;
 
     private final byte[] tokenSecret;
 

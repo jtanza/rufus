@@ -3,7 +3,7 @@ package com.tanza.rufus.feed;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
-import com.tanza.rufus.feed.FeedParser.Response;
+import com.tanza.rufus.feed.FeedParser.FeedResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class FeedParserTest {
 
         String validFeed = "http://rss.nytimes.com/services/xml/rss/nyt/US.xml";
 
-        List<Response> parse = feedParser.parse(u, Collections.singletonList(validFeed));
+        List<FeedResponse> parse = feedParser.parse(u, Collections.singletonList(validFeed));
         Assert.assertEquals(1, parse.size());
         Assert.assertTrue(parse.get(0).isValid());
         Assert.assertNull(parse.get(0).getError());
@@ -53,7 +53,7 @@ public class FeedParserTest {
 
         String invalidFeed = "rss.nytimes.com/notvalid";
 
-        List<Response> parse = feedParser.parse(u, Collections.singletonList(invalidFeed));
+        List<FeedResponse> parse = feedParser.parse(u, Collections.singletonList(invalidFeed));
         Assert.assertEquals(1, parse.size());
         Assert.assertFalse(parse.get(0).isValid());
         Assert.assertNotNull(parse.get(0).getError());

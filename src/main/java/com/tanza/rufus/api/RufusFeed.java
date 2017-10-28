@@ -8,7 +8,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Encapsulation of an article source
@@ -37,7 +36,7 @@ public class RufusFeed {
         }
 
         if (CollectionUtils.isEmpty(source.getTags())) {
-            source.setTags(Collections.EMPTY_LIST); //never null!
+            source.setTags(Collections.emptyList()); //never null!
         }
 
         return new RufusFeed(source, feed);

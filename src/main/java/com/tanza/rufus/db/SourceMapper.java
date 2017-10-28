@@ -2,6 +2,7 @@ package com.tanza.rufus.db;
 
 import com.tanza.rufus.api.Source;
 
+import org.apache.commons.lang3.StringUtils;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
@@ -12,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by jtanza.
@@ -20,12 +20,16 @@ import java.util.Objects;
 public class SourceMapper implements ResultSetMapper<Source> {
     @Override
     public Source map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
-        Source source = null;
+        String resultSource = resultSet.getString("source");
+        if (StringUtils.isEmpty(resultSource)) {
+            return null;
+        }
+
+        Source source;
         try {
-            source = new Source(new URL(resultSet.getString("source")));
+            source = new Source(new URL(resultSource));
         } catch (MalformedURLException e) {
-            //TODO throw error
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         Array tags = resultSet.getArray("tags");
@@ -38,4 +42,5 @@ public class SourceMapper implements ResultSetMapper<Source> {
         source.setFrontpage(resultSet.getBoolean("frontpage"));
         return source;
     }
+
 }
