@@ -1,4 +1,4 @@
-<form id="registrationForm">
+<form id="registrationForm" onkeypress="return searchKeyPress(event);">
     <div class="row">
         <div class="five columns">
             <h3>Register</h3>
@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="six columns">
-        <input class="button-primary" onclick="register()" type="submit" value="Submit">
+        <input class="button-primary" id="btnSearch" onclick="register()" type="button" value="Submit">
         <p>
             <span class="nowrap"><a href="#!login">Already have an account? Login!</a></span>
         </p>

@@ -115,16 +115,12 @@ function error(errorResponse) {
     router.resolve();
 })();
 
-
-//TODO redo with windoweventlistener
 //login
 function login() {
     var formData = new FormData();
     formData.append("email", getId("emailInput").value);
     formData.append("password", getId("passwordInput").value);
     client.post('api/user/login', formData, null, function(resp) {
-        //do work
-        console.log("login attempted");
         storeToken(resp);
         window.location.replace('#!frontpage');
     }, function(resp) {
@@ -132,7 +128,6 @@ function login() {
     });
 }
 
-//TODO redo with windoweventlistener
 //register
 function register() {
     var newUser = {};
@@ -144,4 +139,14 @@ function register() {
     }, function(resp) {
         error(resp);
     });
+}
+
+//mock form enter behavior
+function searchKeyPress(e) {
+    e = e || window.event; //look for window.event in case event isn't passed in
+    if (e.keyCode == 13) {
+        getId('btnSearch').click();
+        return false;
+    }
+    return true;
 }
