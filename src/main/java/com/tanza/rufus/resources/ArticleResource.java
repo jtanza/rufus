@@ -5,6 +5,7 @@ import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
+import com.tanza.rufus.feed.FeedConstants;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.feed.FeedUtils;
@@ -29,7 +30,12 @@ import java.util.stream.Collectors;
 import static com.tanza.rufus.feed.FeedConstants.*;
 
 /**
- * Created by jtanza.
+ * Resource for {@link Article} related processing.
+ *
+ * All endpoints supporting anonymous user sessions return data
+ * from the collection of {@link FeedConstants#STARTER_FEEDS}.
+ *
+ * @author jtanza
  */
 @Path("/articles")
 @Produces(MediaType.APPLICATION_JSON)
@@ -57,36 +63,27 @@ public class ArticleResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response frontPage(@Auth Optional<User> user) {
-        if (user.isPresent()) {
-            User existing = user.get();
-            return articleView(() -> processor.buildFrontpageCollection(existing, DEFAULT_DOCS_PER_FEED));
-        } else {
-            return articleView(() -> processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
-        }
+        return user.isPresent()
+            ? articleView(() -> processor.buildFrontpageCollection(user.get(), DEFAULT_DOCS_PER_FEED))
+            : articleView(() -> processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
     }
 
     @Path("/all")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response all(@Auth Optional<User> user) {
-        if (user.isPresent()) {
-            User existing = user.get();
-            return articleView(() -> processor.buildArticleCollection(existing));
-        } else {
-            return articleView(processor::buildArticleCollection);
-        }
+        return  user.isPresent()
+            ? articleView(() -> processor.buildArticleCollection(user.get()))
+            : articleView(processor::buildArticleCollection);
     }
 
     @Path("/tagged")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
-        if (user.isPresent()) {
-            User existing = user.get();
-            return articleView(() -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
-        } else {
-            return articleView(() -> processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
-        }
+        return user.isPresent()
+            ? articleView(() -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED))
+            : articleView(() -> processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
     }
 
     @Path("/tagStubs")
