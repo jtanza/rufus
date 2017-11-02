@@ -221,3 +221,9 @@ margin: 30px 0 30px 0;
     font-size: 90%;
 }
 
+.inactive-link {
+    pointer-events: none;
+    cursor: default;
+    color: #d3d3d3;
+}
+

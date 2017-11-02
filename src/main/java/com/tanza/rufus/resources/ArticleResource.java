@@ -12,7 +12,6 @@ import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
@@ -93,12 +92,19 @@ public class ArticleResource {
     @Path("/tagStubs")
     @GET
     public Response tagStubs(@Auth Optional<User> user) {
-        List<Source> sources = user.isPresent()
-            ? articleDao.getSources(userDao.findByEmail(user.get().getEmail()).getId())
-            : articleDao.getPublicSources();
-
-        if (CollectionUtils.isEmpty(sources)) {
-            return Response.ok().build();
+        List<Source> sources;
+        if (user.isPresent()) {
+            User present = user.get();
+            if (!articleDao.hasSubscriptions(present.getId())) {
+                return Response.status(Response.Status.OK)
+                    .type(MediaType.APPLICATION_JSON_TYPE)
+                    .entity(Collections.EMPTY_LIST)
+                    .build();
+            } else {
+                sources = articleDao.getSources(userDao.findByEmail(present.getEmail()).getId());
+            }
+        } else {
+            sources = articleDao.getPublicSources();
         }
 
         Set<String> tags = sources.stream()

@@ -78,7 +78,7 @@ function error(errorResponse) {
     }
 
     //load tags
-    window.onload = function() {
+    window.addEventListener("load", function() {
         var template = getId('tags-template').innerHTML;
         Mustache.parse(template);
         client.get('api/articles/tagStubs', function (resp) {
@@ -86,7 +86,11 @@ function error(errorResponse) {
         }, function(resp) {
             error(resp);
         });
-    };
+
+        if (!getStoredToken()) {
+            getId('bookmarked').setAttribute('class', 'inactive-link');
+        } 
+    });
 
     //app routing
     var router = new Navigo(null, true, '#!');
@@ -122,7 +126,8 @@ function login() {
     formData.append("password", getId("passwordInput").value);
     client.post('api/user/login', formData, null, function(resp) {
         storeToken(resp);
-        window.location.replace('#!frontpage');
+        window.location.assign('#!frontpage');
+        window.location.reload();
     }, function(resp) {
         error(resp);
     });
@@ -150,3 +155,5 @@ function searchKeyPress(e) {
     }
     return true;
 }
+
+

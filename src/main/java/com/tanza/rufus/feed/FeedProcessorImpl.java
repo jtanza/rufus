@@ -11,7 +11,6 @@ import com.google.common.cache.LoadingCache;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -164,11 +163,10 @@ public class FeedProcessorImpl implements FeedProcessor {
                 .stream().map(RufusFeed::generate).collect(Collectors.toList());
 
         } else {
-            List<Source> sources = articleDao.getSources(userId);
-            if (CollectionUtils.isEmpty(sources)) {
+            if (!articleDao.hasSubscriptions(userId)) {
                 return Collections.emptyMap();
             }
-            requests = sources
+            requests = articleDao.getSources(userId)
                 .stream().collect(Collectors.toList())
                 .stream().map(RufusFeed::generate)
                 .collect(Collectors.toList());
