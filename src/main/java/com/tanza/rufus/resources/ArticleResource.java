@@ -59,9 +59,9 @@ public class ArticleResource {
     public Response frontPage(@Auth Optional<User> user) {
         if (user.isPresent()) {
             User existing = user.get();
-            return articleView(existing, () -> processor.buildFrontpageCollection(existing, DEFAULT_DOCS_PER_FEED));
+            return articleView(() -> processor.buildFrontpageCollection(existing, DEFAULT_DOCS_PER_FEED));
         } else {
-            return articleView(processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
+            return articleView(() -> processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
         }
     }
 
@@ -71,9 +71,9 @@ public class ArticleResource {
     public Response all(@Auth Optional<User> user) {
         if (user.isPresent()) {
             User existing = user.get();
-            return articleView(existing, () -> processor.buildArticleCollection(existing));
+            return articleView(() -> processor.buildArticleCollection(existing));
         } else {
-            return articleView(processor.buildArticleCollection());
+            return articleView(processor::buildArticleCollection);
         }
     }
 
@@ -83,9 +83,9 @@ public class ArticleResource {
     public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
         if (user.isPresent()) {
             User existing = user.get();
-            return articleView(existing, () -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
+            return articleView(() -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED));
         } else {
-            return articleView(processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
+            return articleView(() -> processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
         }
     }
 
@@ -150,7 +150,7 @@ public class ArticleResource {
     @GET
     public Response bookmarked(@Auth User user) {
         final User u = userDao.findByEmail(user.getEmail());
-        return articleView(user, () -> articleDao.getBookmarked(u.getId()));
+        return articleView(() -> articleDao.getBookmarked(u.getId()));
     }
 
     @Path("/new")
@@ -181,17 +181,11 @@ public class ArticleResource {
         return Response.ok(articleDao.getSources(user.getId())).build();
     }
 
-    private Response articleView(Collection<Article> articles) {
+    private Response articleView(Supplier<Collection<Article>> articleSupplier) {
+        Collection<Article> articles = articleSupplier.get();
         if (articles.isEmpty() || FeedUtils.isNull(articles)) {
             return Response.ok(ArticleView.EMPTY).build();
         }
         return Response.ok(ArticleView.ofArticles(articles)).build();
-    }
-
-    private Response articleView(User user, Supplier<Collection<Article>> articleSupplier) {
-        Collection<Article> articles = articleDao.hasSubscriptions(user.getId())
-            ? articleSupplier.get()
-            : Collections.EMPTY_LIST;
-        return articleView(articles);
     }
 }

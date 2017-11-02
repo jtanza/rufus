@@ -63,7 +63,7 @@ function error(errorResponse) {
             errCode: errorResponse.status
         });
     }, function(resp) {
-        error(resp);
+        console.log("ruh-oh could not fetch error page, letting errors crop up to client");
     });
 }
 
