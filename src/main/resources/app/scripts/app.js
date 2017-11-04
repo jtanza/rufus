@@ -77,8 +77,8 @@ function error(errorResponse) {
         });
     }
 
-    //load tags
     window.addEventListener("load", function() {
+        //load tags
         var template = getId('tags-template').innerHTML;
         Mustache.parse(template);
         client.get('api/articles/tagStubs', function (resp) {
@@ -87,9 +87,18 @@ function error(errorResponse) {
             error(resp);
         });
 
+        //set login/logout based upon current session
         if (!getStoredToken()) {
             getId('bookmarked').setAttribute('class', 'inactive-link');
-        } 
+        } else {
+            var login = getId('login');
+            login.innerHTML = 'Logout';
+            login.removeAttribute('href');
+            login.onclick = function() {
+                sessionStorage.removeItem('jwt_token');
+                window.location.reload();
+            }
+        }
     });
 
     //app routing
