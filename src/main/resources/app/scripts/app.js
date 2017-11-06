@@ -64,6 +64,7 @@ function error(errorResponse) {
         });
     }, function(resp) {
         console.log("ruh-oh could not fetch error page, letting errors crop up to client");
+        window.location.reload();
     });
 }
 
@@ -147,9 +148,20 @@ function register() {
     var newUser = {};
     newUser.email = getId('emailInput').value;
     newUser.password = getId('passwordInput').value;
+
+    var starterFeeds = [];
+    var inputs = document.getElementsByTagName("input");
+    for(var i = 0; i < inputs.length; i++) {
+        if(inputs[i].type == "checkbox" && inputs[i].checked) {
+            starterFeeds.push(inputs[i].id);
+        }
+    }
+    newUser.starterFeeds = starterFeeds;
+
     client.post('api/user/new', JSON.stringify(newUser), "application/json;charset=UTF-8", function(resp) {
-        //do work
-        console.log(resp);
+        storeToken(resp);
+        window.location.assign('#!frontpage');
+        window.location.reload();
     }, function(resp) {
         error(resp);
     });

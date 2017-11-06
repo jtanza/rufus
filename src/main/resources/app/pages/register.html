@@ -1,16 +1,78 @@
 <form id="registrationForm" onkeypress="return searchKeyPress(event);">
     <div class="row">
-        <div class="five columns">
+        <div class="ten columns">
             <h3>Register</h3>
-            <label for="emailInput">Your email</label>
-            <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="emailInput">
         </div>
     </div>
-    <div class="row">
-        <div class="five columns">
-            <label for="passwordInput">Your password</label>
-            <input class="u-full-width" type="password" placeholder="super_secret" id="passwordInput">
+
+    <div class="register_form">
+        <div class="row">
+            <div class="three columns">
+                <label for="emailInput">Your email</label>
+                <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="emailInput">
+            </div>
+            <div class="three columns">
+                <label for="passwordInput">Your password</label>
+                <input class="u-full-width" type="password" placeholder="super_secret" id="passwordInput">
+            </div>
         </div>
+    </div>
+    <div class="ten columns">
+        <p>
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
+            rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo
+        </p>
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Subscribe</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>New York Times - World</td>
+                <td>World News</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="ny_times_world">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Wired</td>
+                <td>Technology</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="wired">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Washington Post - Politics</td>
+                <td>U.S. Politics</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="washington_post_politics">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Scientific American</td>
+                <td>Science</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="scientific_american">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="six columns">
         <input class="button-primary" id="btnSearch" onclick="register()" type="button" value="Submit">

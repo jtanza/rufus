@@ -15,7 +15,6 @@ public final class FeedConstants {
             .put("ny_times_world", "http://rss.nytimes.com/services/xml/rss/nyt/World.xml")
             .put("washington_post_politics", "http://feeds.washingtonpost.com/rss/politics")
             .put("wired", "https://www.wired.com/feed/rss")
-            .put("espn", "http://www.espn.com/espn/rss/news")
             .put("scientific_american", "http://rss.sciam.com/ScientificAmerican-News")
             .build();
 }
