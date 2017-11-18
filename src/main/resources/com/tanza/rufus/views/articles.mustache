@@ -3,7 +3,12 @@
         <div class="article-content">
             <div class="title">
                 <a class="bookmark">
-                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                    {{#bookmark}}
+                        <i class="fa fa-bookmark" aria-hidden="true"></i>
+                    {{/bookmark}}
+                    {{^bookmark}}
+                        <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+                    {{/bookmark}}
                 </a>
                 <h6><a href={{url}}>{{title}}</a></h6>
             </div>

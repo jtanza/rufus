@@ -127,7 +127,7 @@ public class ArticleResource {
 
     @Path("/isBookmarked")
     @Consumes(MediaType.APPLICATION_JSON)
-    @POST
+    @GET
     public Response isBookmarked(@Auth User user, Article article) {
         user = userDao.findByEmail(user.getEmail());
         return Response.ok(articleDao.getBookmarked(user.getId()).contains(article)).build();
@@ -135,7 +135,7 @@ public class ArticleResource {
 
     @Path("/removeBookmark")
     @Consumes(MediaType.APPLICATION_JSON)
-    @POST
+    @PUT
     public Response removeBookmark(@Auth User user, Article article) {
         user = userDao.findByEmail(user.getEmail());
         articleDao.removeArticle(user.getId(), article.getUrl());
