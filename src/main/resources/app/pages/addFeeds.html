@@ -1,11 +1,22 @@
-<div class="col-md-8">
-    <h3>Subscribe to New Feeds</h3>
-    <div id="add-description">
-        <p>Accepts a whitespace separated list of RSS/Atom web feeds</p>
-        <p>Rejects invalid feeds, along with any which the user may already be subscribed to</p>
+<form id="feedForm" onkeypress="return searchKeyPress(event);">
+    <div class="row">
+        <div class="eight columns">
+            <input class="button" id="ompl" onclick="omplImport()" type="button" value="Select OPML File" style="float: right;">
+        </div>
+        <div class="eight columns">
+            <h3>Add Feeds</h3>
+            <p>
+                Accepts a whitespace separated list of RSS/Atom web feeds.
+                Rejects invalid feeds, along with any which the user may already be subscribed to.
+            </p>
+            <label for="subscriptionFeeds">Feeds</label>
+            <textarea class="u-full-width" placeholder="http://rss.rufus.com/tech.xml http://news.co/rss/breaking.rss" id="subscriptionFeeds"></textarea>
+        </div>
     </div>
-    <form id="feed-form">
-        <textarea type="text" id="subscribe" ng-model="feed" class="form-control" rows="3" placeholder="http://rss.rufus.com/front_page.xml http://news.co/rss/breaking_news.rss" form="feed-form"></textarea>
-        <button type="submit" class="btn btn-default btn-sm" ng-click="add(feed)">Submit</button>
-    </form>
-</div>
+    <div class="row">
+        <div class="five columns"></div>
+    </div>
+    <div class="six columns">
+        <input class="button-primary" id="btnSearch" onclick="subscribe()" type="button" value="Submit">
+    </div>
+</form>

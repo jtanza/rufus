@@ -56,7 +56,7 @@ function getStoredToken() {
 }
 
 //generic error handling
-function error(errorResponse) {
+function errorPage(errorResponse) {
     client.get('pages/error.html', function(resp) {
         Mustache.parse(resp);
         getId('content').innerHTML = Mustache.render(resp, {
@@ -74,7 +74,7 @@ function error(errorResponse) {
         client.get(url, function(resp) {
             getId(id).innerHTML = resp;
         }, function(resp) {
-            error(resp);
+            errorPage(resp);
         });
     }
 
@@ -85,7 +85,7 @@ function error(errorResponse) {
         client.get('api/articles/tagStubs', function (resp) {
             getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         }, function(resp) {
-            error(resp);
+            errorPage(resp);
         });
 
         //set login/logout based upon current session
@@ -139,7 +139,7 @@ function login() {
         window.location.assign('#!frontpage');
         window.location.reload();
     }, function(resp) {
-        error(resp);
+        errorPage(resp);
     });
 }
 
@@ -158,12 +158,25 @@ function register() {
     }
     newUser.starterFeeds = starterFeeds;
 
-    client.post('api/user/new', JSON.stringify(newUser), "application/json;charset=UTF-8", function(resp) {
+    client.post('api/user/new', JSON.stringify(newUser), 'application/json;charset=UTF-8', function(resp) {
         storeToken(resp);
         window.location.assign('#!frontpage');
         window.location.reload();
     }, function(resp) {
-        error(resp);
+        errorPage(resp);
+    });
+}
+
+//subscribe to new feeds
+function subscribe() {
+    var feeds = getId('subscriptionFeeds').value;
+    var feedData = JSON.stringify(feeds.split(' '));
+    client.post('api/articles/new', feedData, 'application/json;charset=UTF-8', function(resp) {
+        alert(resp);
+        window.location.assign('#!add');
+        window.location.reload();
+    }, function (resp) {
+        errorPage(resp);
     });
 }
 

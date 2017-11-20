@@ -7,6 +7,7 @@ import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedConstants;
 import com.tanza.rufus.feed.FeedParser;
+import com.tanza.rufus.feed.FeedParser.FeedResponse;
 import com.tanza.rufus.feed.FeedProcessor;
 import com.tanza.rufus.feed.FeedUtils;
 import com.tanza.rufus.views.ArticleView;
@@ -156,7 +157,7 @@ public class ArticleResource {
         if (feeds.isEmpty()) {
             throw new BadRequestException();
         }
-        return Response.ok(parser.parse(user, feeds)).build();
+        return Response.ok(FeedResponse.formatMessage(parser.parse(user, feeds))).build();
     }
 
     @Path("/frontpageNew")

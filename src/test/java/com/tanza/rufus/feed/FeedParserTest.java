@@ -1,10 +1,10 @@
 package com.tanza.rufus.feed;
 
+import com.google.common.collect.Lists;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.feed.FeedParser.FeedResponse;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -14,6 +14,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * @author jtanza
@@ -41,9 +43,9 @@ public class FeedParserTest {
         String validFeed = "http://rss.nytimes.com/services/xml/rss/nyt/US.xml";
 
         List<FeedResponse> parse = feedParser.parse(u, Collections.singletonList(validFeed));
-        Assert.assertEquals(1, parse.size());
-        Assert.assertTrue(parse.get(0).isValid());
-        Assert.assertNull(parse.get(0).getError());
+        assertEquals(1, parse.size());
+        assertTrue(parse.get(0).isValid());
+        assertNull(parse.get(0).getError());
     }
 
     @Test
@@ -54,9 +56,28 @@ public class FeedParserTest {
         String invalidFeed = "rss.nytimes.com/notvalid";
 
         List<FeedResponse> parse = feedParser.parse(u, Collections.singletonList(invalidFeed));
-        Assert.assertEquals(1, parse.size());
-        Assert.assertFalse(parse.get(0).isValid());
-        Assert.assertNotNull(parse.get(0).getError());
+        assertEquals(1, parse.size());
+        assertFalse(parse.get(0).isValid());
+        assertNotNull(parse.get(0).getError());
+    }
+
+    @Test
+    public void testMessage() {
+        User u = new User();
+        u.setId(101L);
+
+        List<FeedResponse> parse = feedParser.parse(
+            u,
+            Lists.newArrayList(
+                "http://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+                "rss.rufus.com/notvalid", "rss.invalid.com"
+            )
+        );
+        String message = FeedResponse.formatMessage(parse);
+        assertNotNull(message);
+        System.out.print(message);
+
+
     }
 
     private static List<Source> existingSources() throws MalformedURLException {

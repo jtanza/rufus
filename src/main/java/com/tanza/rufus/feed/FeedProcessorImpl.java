@@ -13,6 +13,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -194,7 +195,7 @@ public class FeedProcessorImpl implements FeedProcessor {
         List<Document> ret = new ArrayList<>();
         feedEntry.getRight().forEach(e -> {
             FeedUtils.mergeAuthors(e);
-            String description =  FeedUtils.clean(e.getDescription().getValue());
+            String description = e.getDescription() != null ? FeedUtils.clean(e.getDescription().getValue()) : StringUtils.EMPTY;
             if (truncateDescriptions) {
                 description = FeedUtils.truncate(description, FeedConstants.MAX_DESCRIP_LEN);
             }

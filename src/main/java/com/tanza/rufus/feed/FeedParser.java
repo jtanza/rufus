@@ -6,6 +6,7 @@ import com.tanza.rufus.db.ArticleDao;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,15 +50,15 @@ public class FeedParser {
             if (existing.contains(f)) {
                 feedFeedResponses.add(FeedResponse.invalid("Already Subscribed to Feed!", f));
             } else {
-                FeedResponse parser = FeedParser.validate(f);
-                if (parser.isValid()) {
+                FeedResponse response = FeedParser.validate(f);
+                if (response.isValid()) {
                     logger.info("added feed {} for user {}", f, userId);
-                    articleDao.addFeed(userId, parser.getUrl());
+                    articleDao.addFeed(userId, response.getUrl());
                 }
-                feedFeedResponses.add(parser);
+                feedFeedResponses.add(response);
             }
         });
-        processor.invalidateCache(userId); //update the user's article cache after having added new sources
+        processor.invalidateCache(userId); //invalidate the user's article cache after having added new sources
         return feedFeedResponses;
     }
 
@@ -102,6 +103,33 @@ public class FeedParser {
 
         public String getUrl() {
             return url;
+        }
+
+        /**
+         * Formats a collection of {@param responses} into a single user facing message
+         * to be used after an {@link User} attempts to add new feed subscriptions.
+         *
+         * @param responses
+         * @return
+         */
+        public static String formatMessage(List<FeedResponse> responses) {
+            StringBuilder builder = new StringBuilder();
+            List<FeedResponse> valid = responses.stream().filter(FeedResponse::isValid).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(valid)) {
+                builder.append("Successfully added : \n");
+                valid.stream().forEach(r -> builder.append(r.getUrl()).append("\n"));
+            }
+            responses.removeAll(valid);
+            if (CollectionUtils.isNotEmpty(responses)) {
+                builder.append("\nCould not add : \n");
+                responses.stream().forEach(r -> builder
+                    .append(r.getUrl())
+                    .append(" - Reason : ")
+                    .append(r.getError())
+                    .append("\n")
+                );
+            }
+            return builder.toString();
         }
     }
 }
