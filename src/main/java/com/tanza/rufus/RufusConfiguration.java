@@ -8,9 +8,6 @@ import io.dropwizard.db.DataSourceFactory;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-/**
- * Created by jtanza.
- */
 public class RufusConfiguration extends Configuration {
 
     @Valid

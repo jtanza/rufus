@@ -22,10 +22,6 @@ import javax.ws.rs.core.Response.Status;
 import java.util.List;
 import java.util.Optional;
 
-
-/**
- * Created by jtanza.
- */
 @Path("/user")
 public class UserResource {
 

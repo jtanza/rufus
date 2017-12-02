@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.Collections;
 
 /**
- * Encapsulation of an article source
+ * Internal representation of an RSS feed source
  * post processing by {@link FeedParser}
  *
  * Created by jtanza.

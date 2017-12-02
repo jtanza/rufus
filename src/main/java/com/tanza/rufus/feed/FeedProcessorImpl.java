@@ -25,10 +25,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author jtanza
- */
 public class FeedProcessorImpl implements FeedProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FeedProcessorImpl.class);
 
@@ -52,16 +48,16 @@ public class FeedProcessorImpl implements FeedProcessor {
 
     private void init() {
         articleCache = CacheBuilder.newBuilder()
-                .maximumSize(MAX_CACHE)
-                .expireAfterAccess(TTL, TimeUnit.MINUTES)
-                .build(
-                        new CacheLoader<Long, Map<Channel, List<Document>>>() {
-                            @Override
-                            public Map<Channel, List<Document>> load(Long userId) throws Exception {
-                                return buildChannelMap(userId);
-                            }
-                        }
-                );
+            .maximumSize(MAX_CACHE)
+            .expireAfterAccess(TTL, TimeUnit.MINUTES)
+            .build(
+                new CacheLoader<Long, Map<Channel, List<Document>>>() {
+                    @Override
+                    public Map<Channel, List<Document>> load(Long userId) throws Exception {
+                        return buildChannelMap(userId);
+                    }
+                }
+            );
     }
 
     @Override

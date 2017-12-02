@@ -8,9 +8,6 @@ import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.List;
 
-/**
- * @author jtanza
- */
 public class UserUtils {
 
     private UserUtils() {throw new AssertionError();}
@@ -24,8 +21,8 @@ public class UserUtils {
      */
     public static boolean valid(String email, String password) {
         return StringUtils.isNotEmpty(email)
-            || StringUtils.isNotEmpty(password)
-            || EmailValidator.getInstance().isValid(email);
+            && StringUtils.isNotEmpty(password)
+            && EmailValidator.getInstance().isValid(email);
     }
 
     /**

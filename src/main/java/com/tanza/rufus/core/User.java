@@ -3,9 +3,6 @@ package com.tanza.rufus.core;
 import java.io.Serializable;
 import java.security.Principal;
 
-/**
- * Created by jtanza.
- */
 public class User implements Principal, Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -13,7 +10,7 @@ public class User implements Principal, Serializable {
     private String email;
     private String password;
 
-    public User() {} //jackson
+    public User() {}
 
     public User(String email, String password) {
         this.email = email;

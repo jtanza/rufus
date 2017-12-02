@@ -9,49 +9,30 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * @author jtanza
- */
 public class FeedUtils {
 
     private FeedUtils() {
         throw new AssertionError(); //noninstantiability
     }
 
-    /**
-     * @param entry
-     */
     public static void mergeAuthors(SyndEntry entry) {
         if (CollectionUtils.isEmpty(entry.getAuthors())) {
             entry.setAuthors(Collections.singletonList(entry.getAuthor()));
         }
     }
 
-    /**
-     * Truncate article description
-     *
-     * @param value
-     * @param maxLength
-     * @return
-     */
     public static String truncate(String value, int maxLength) {
         String ret;
         ret = value.length() > maxLength ? StringUtils.abbreviate(value, maxLength) : value;
         return ret;
     }
 
-    /**
-     * @param articles
-     * @return
-     */
     public static List<Article> sort(List<Article> articles) {
         articles.sort((a, b) -> b.getPublicationDate().compareTo(a.getPublicationDate()));
         return articles;
@@ -71,17 +52,13 @@ public class FeedUtils {
         return Jsoup.parse(StringEscapeUtils.unescapeHtml4(content)).text();
     }
 
-    /**
-     * @param articles
-     * @param bookmarks
-     */
     public static void markBookmarks(List<Article> articles, Set<Article> bookmarks) {
         articles.stream().filter(bookmarks::contains).forEach(a -> a.setBookmark(true));
     }
 
     /**
      * Determines whether or not an {@link Collection}
-     * contains <i>only</i> null elements
+     * contains <i>only</i> null elements.
      *
      * @param collection
      * @return

@@ -31,9 +31,6 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.HmacKey;
 import org.skife.jdbi.v2.DBI;
 
-/**
- * Created by jtanza.
- */
 public class RufusApplication extends Application<RufusConfiguration> {
     private static final String DB_SOURCE = "postgresql";
     //TODO

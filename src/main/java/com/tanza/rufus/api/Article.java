@@ -5,14 +5,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author jtanza
- */
 public class Article implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +21,7 @@ public class Article implements Serializable {
     private String channelUrl;
     private boolean bookmark;
 
-    public Article() {} //jackson dummy constructor
+    public Article() {}
 
     public Article(String title, Date publicationDate, List authors, String description, String url, String channelTitle, String channelUrl) {
         this.title = Objects.requireNonNull(title, "title must not be null!");
@@ -77,7 +73,6 @@ public class Article implements Serializable {
     public void setBookmark(boolean bookmark) {
         this.bookmark = bookmark;
     }
-    public static Comparator<Article> byDate = Comparator.comparing(Article::getPublicationDate);
 
     @Override
     public boolean equals(Object o) {

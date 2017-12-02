@@ -23,7 +23,7 @@ public class Source implements Serializable {
     private boolean frontpage;
     private List<String> tags;
 
-    public Source() {} //dummy jackson constructor
+    public Source() {}
 
     public Source(URL url) {
         this.url = url;

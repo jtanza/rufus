@@ -3,9 +3,6 @@ package com.tanza.rufus.core;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @author jtanza
- */
 public class NewUser implements Serializable {
     private static final long serialVersionUID = 1L;
 

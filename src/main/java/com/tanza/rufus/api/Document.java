@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Encapsulation of meta data pulled from a {@link SyndEntry}, used in
- * combination with a {@link Channel} to generate {@link Article}s on the client.
+ * Encapsulation of meta data pulled from a {@link SyndEntry}.
+ * Contains data about an article from an RSS feed source.
  *
  * Created by jtanza.
  */
