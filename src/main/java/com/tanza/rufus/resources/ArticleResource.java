@@ -2,6 +2,7 @@ package com.tanza.rufus.resources;
 
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
+import com.tanza.rufus.api.Source.ClientSource;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
@@ -24,6 +25,9 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -177,6 +181,30 @@ public class ArticleResource {
     public Response getSources(@Auth User user) {
         user = userDao.findByEmail(user.getEmail());
         return Response.ok(articleDao.getSources(user.getId())).build();
+    }
+
+    @Path("userFeeds")
+    @GET
+    public Response userFeeds(@Auth User user) {
+        user = userDao.findByEmail(user.getEmail());
+        List<ClientSource> sources = articleDao.getSources(user.getId())
+            .stream()
+            .map(ClientSource::ofExisting)
+            .collect(Collectors.toList());
+        return Response.ok(sources).build();
+    }
+
+    @Path("unsubscribe")
+    @PUT
+    public Response unsubscribe(@Auth User user, String url) {
+        try {
+            URL parseUrl = new URL(url); //ensure arg is a valid url
+            parseUrl.toURI();
+            articleDao.removeSource(url);
+            return Response.ok().build();
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     private Response articleView(Supplier<Collection<Article>> articleSupplier) {

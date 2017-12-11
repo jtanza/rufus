@@ -1,0 +1,36 @@
+<p>
+    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+    totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta
+    sunt explicabo
+</p>
+<table class="u-full-width">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Frontpage</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#sources}}
+        <tr>
+            <td><a href={{url}}>{{sourceName}}</a></td>
+            <td>
+                <label class="frontpage-checkbox">
+                    {{#frontpage}}
+                        <input type="checkbox" id={{sourceName}} checked> {{/frontpage}} {{^frontpage}}
+                    <input type="checkbox" id={{sourceName}}> {{/frontpage}}
+                    <span class="label-body"></span>
+                </label>
+            </td>
+            <td>
+                <label class="unsubscribe-action">
+                    <a data-value={{url}} id="unsubscribe-form" onclick="unsub(this.getAttribute('data-value'))">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </a>
+                </label>
+            </td>
+        </tr>
+    {{/sources}}
+    </tbody>
+</table>

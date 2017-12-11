@@ -231,3 +231,7 @@ margin: 30px 0 30px 0;
     margin: 4% 0 4% 0;
 }
 
+.settings-sidebar ul {
+    padding-left: 0;
+}
+

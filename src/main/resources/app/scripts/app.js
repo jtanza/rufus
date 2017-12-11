@@ -55,6 +55,14 @@ function getStoredToken() {
     return sessionStorage.getItem('jwt_token')
 }
 
+function generateHTML(url, id) {
+    client.get(url, function(resp) {
+        getId(id).innerHTML = resp;
+    }, function(resp) {
+        errorPage(resp);
+    });
+}
+
 //generic error handling
 function errorPage(errorResponse) {
     client.get('pages/error.html', function(resp) {
@@ -70,13 +78,6 @@ function errorPage(errorResponse) {
 
 //page rendering
 (function() {
-    function generateHTML(url, id) {
-        client.get(url, function(resp) {
-            getId(id).innerHTML = resp;
-        }, function(resp) {
-            errorPage(resp);
-        });
-    }
 
     window.addEventListener("load", function() {
         //load tags
@@ -91,6 +92,7 @@ function errorPage(errorResponse) {
         //set login/logout based upon current session
         if (!getStoredToken()) {
             getId('bookmarked').setAttribute('class', 'inactive-link');
+            getId('settings').setAttribute('class', 'inactive-link');
         } else {
             var login = getId('login');
             login.innerHTML = 'Logout';
@@ -125,7 +127,7 @@ function errorPage(errorResponse) {
     router.on('tagged', function(params, query) {
         generateHTML('api/articles/tagged?tag=' + query, 'content');
     }).resolve();
-    
+
     router.resolve();
 })();
 
@@ -190,4 +192,19 @@ function searchKeyPress(e) {
     return true;
 }
 
+//subscribed source feeds
+function userFeeds() {
+    client.get('pages/sources.mustache', function (template) {
+        Mustache.parse(template);
+        client.get('api/articles/userFeeds', function (resp) {
+            getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
+        }, function(resp) {
+            errorPage(resp);
+        }); 
+    });
+}
 
+//TODO
+function unsub(url) {
+    console.log(url);
+}

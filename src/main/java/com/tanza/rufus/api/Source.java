@@ -1,7 +1,9 @@
 package com.tanza.rufus.api;
 
+import com.sun.syndication.feed.synd.SyndFeed;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.SourceMapper;
+import com.tanza.rufus.feed.FeedUtils;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -47,6 +49,40 @@ public class Source implements Serializable {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    /**
+     * POJO used to represent a {@link Source} for display on the client.
+     */
+    public static class ClientSource implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final String sourceName;
+        private final String url;
+        private final boolean frontpage;
+
+        private ClientSource(String sourceName, String url, boolean frontpage) {
+            this.sourceName = sourceName;
+            this.url = url;
+            this.frontpage = frontpage;
+        }
+
+        public static ClientSource ofExisting(Source source) {
+            SyndFeed syndFeed = RufusFeed.generate(source).getFeed();
+            return new ClientSource(FeedUtils.clean(syndFeed.getTitle()), source.getUrl().toExternalForm(), source.isFrontpage());
+        }
+
+        public String getSourceName() {
+            return sourceName;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public boolean isFrontpage() {
+            return frontpage;
+        }
     }
 }
 

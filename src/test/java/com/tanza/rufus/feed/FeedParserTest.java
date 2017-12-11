@@ -29,7 +29,7 @@ public class FeedParserTest {
         ArticleDao articleDao = Mockito.mock(ArticleDao.class);
         FeedProcessor feedProcessor = Mockito.mock(FeedProcessor.class);
         Mockito.when(articleDao.getSources(ArgumentMatchers.anyLong())).thenReturn(existingSources());
-        Mockito.doNothing().when(articleDao).addFeed(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString());
+        Mockito.doNothing().when(articleDao).addSource(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString());
         Mockito.doNothing().when(feedProcessor).invalidateCache(ArgumentMatchers.anyLong());
 
         feedParser = new FeedParser(articleDao, feedProcessor);

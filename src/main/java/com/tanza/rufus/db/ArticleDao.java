@@ -38,7 +38,10 @@ public interface ArticleDao {
     List<Source> getPublicSources();
 
     @SqlUpdate("insert into sources(userid, source) values((select userid from rufususer where userid = :id), :source)")
-    void addFeed(@Bind("id") long id, @Bind("source") String source);
+    void addSource(@Bind("id") long id, @Bind("source") String source);
+
+    @SqlUpdate("delete from sources where source = :source")
+    void removeSource(@Bind("source") String source);
 
     @RegisterMapper(SourceMapper.class)
     @SqlQuery("select * from sources where :tag = any (tags) and userid = :id")

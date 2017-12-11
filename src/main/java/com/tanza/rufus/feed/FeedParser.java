@@ -53,7 +53,7 @@ public class FeedParser {
                 FeedResponse response = FeedParser.validate(f);
                 if (response.isValid()) {
                     logger.info("added feed {} for user {}", f, userId);
-                    articleDao.addFeed(userId, response.getUrl());
+                    articleDao.addSource(userId, response.getUrl());
                 }
                 feedFeedResponses.add(response);
             }

@@ -85,7 +85,7 @@ public class UserResource {
         List<String> starterFeeds = newUser.getStarterFeeds();
         if (CollectionUtils.isNotEmpty(starterFeeds) && UserUtils.validStarterFeeds(starterFeeds)) {
             for (String feed : starterFeeds) {
-                articleDao.addFeed(
+                articleDao.addSource(
                     user.getId(),
                     FeedConstants.STARTER_FEEDS.get(feed)
                 );
