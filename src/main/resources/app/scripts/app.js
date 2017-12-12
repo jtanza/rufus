@@ -40,7 +40,29 @@ var http = function () {
             request.setRequestHeader("Authorization", "Bearer " + token);
         }
         request.send(data);
-    }
+    };
+
+    this.put = function(url, data, contentType, success, error) {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function () {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    success(request.responseText);
+                } else {
+                    error(request);
+                }
+            }
+        };
+        request.open('PUT', url);
+        if (contentType) {
+            request.setRequestHeader("Content-Type", contentType);
+        }
+        var token = getStoredToken();
+        if (token) {
+            request.setRequestHeader("Authorization", "Bearer " + token);
+        }
+        request.send(data);
+    };
 }; var client = new http();
 
 function getId(id) {
@@ -204,7 +226,10 @@ function userFeeds() {
     });
 }
 
-//TODO
-function unsub(url) {
-    console.log(url);
+function unsub(source, url) {
+    if (confirm("Are you sure you would like to unsubscribe to " + source  + " ?")) {
+        client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
+            getId(url).remove();
+        });
+    }
 }

@@ -13,7 +13,7 @@
     </thead>
     <tbody>
     {{#sources}}
-        <tr>
+        <tr id="{{url}}">
             <td><a href={{url}}>{{sourceName}}</a></td>
             <td>
                 <label class="frontpage-checkbox">
@@ -25,7 +25,7 @@
             </td>
             <td>
                 <label class="unsubscribe-action">
-                    <a data-value={{url}} id="unsubscribe-form" onclick="unsub(this.getAttribute('data-value'))">
+                    <a data-name={{sourceName}} data-value={{url}} onclick="unsub(this.getAttribute('data-name'), this.getAttribute('data-value'))">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
                     </a>
                 </label>
