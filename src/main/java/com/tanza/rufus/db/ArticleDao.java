@@ -2,6 +2,8 @@ package com.tanza.rufus.db;
 
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
+import com.tanza.rufus.core.User;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
@@ -11,7 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Dao for saved articles (bookmarks)
+ * DAO for saved {@link Article}s.
+ *
+ * All {@link Article}s persisted to disk are those
+ * in which an {@link User} has bookmarked on the client.
  *
  */
 @RegisterMapper(ArticleMapper.class)

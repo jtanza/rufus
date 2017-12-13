@@ -18,6 +18,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Service responsible for parsing and validating
+ * {@link User} requested RSS feed sources.
+ *
  * Created by jtanza.
  */
 

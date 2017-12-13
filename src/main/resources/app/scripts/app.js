@@ -81,12 +81,11 @@ function generateHTML(url, id) {
     client.get(url, function(resp) {
         getId(id).innerHTML = resp;
     }, function(resp) {
-        errorPage(resp);
+        genericErrorPage(resp);
     });
 }
 
-//generic error handling
-function errorPage(errorResponse) {
+function genericErrorPage(errorResponse) {
     client.get('pages/error.html', function(resp) {
         Mustache.parse(resp);
         getId('content').innerHTML = Mustache.render(resp, {
@@ -100,7 +99,6 @@ function errorPage(errorResponse) {
 
 //page rendering
 (function() {
-
     window.addEventListener("load", function() {
         //load tags
         var template = getId('tags-template').innerHTML;
@@ -108,7 +106,7 @@ function errorPage(errorResponse) {
         client.get('api/articles/tagStubs', function (resp) {
             getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         }, function(resp) {
-            errorPage(resp);
+            genericErrorPage(resp);
         });
 
         //set login/logout based upon current session
@@ -153,8 +151,7 @@ function errorPage(errorResponse) {
     router.resolve();
 })();
 
-//login
-function login() {
+function userLogin() {
     var formData = new FormData();
     formData.append("email", getId("emailInput").value);
     formData.append("password", getId("passwordInput").value);
@@ -163,12 +160,11 @@ function login() {
         window.location.assign('#!frontpage');
         window.location.reload();
     }, function(resp) {
-        errorPage(resp);
+        genericErrorPage(resp);
     });
 }
 
-//register
-function register() {
+function registerUser() {
     var newUser = {};
     newUser.email = getId('emailInput').value;
     newUser.password = getId('passwordInput').value;
@@ -187,7 +183,7 @@ function register() {
         window.location.assign('#!frontpage');
         window.location.reload();
     }, function(resp) {
-        errorPage(resp);
+        genericErrorPage(resp);
     });
 }
 
@@ -200,7 +196,7 @@ function subscribe() {
         window.location.assign('#!add');
         window.location.reload();
     }, function (resp) {
-        errorPage(resp);
+        genericErrorPage(resp);
     });
 }
 
@@ -214,20 +210,19 @@ function searchKeyPress(e) {
     return true;
 }
 
-//subscribed source feeds
 function userFeeds() {
     client.get('pages/sources.mustache', function (template) {
         Mustache.parse(template);
         client.get('api/articles/userFeeds', function (resp) {
             getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
         }, function(resp) {
-            errorPage(resp);
+            genericErrorPage(resp);
         }); 
     });
 }
 
-function unsub(source, url) {
-    if (confirm("Are you sure you would like to unsubscribe to " + source  + " ?")) {
+function unsubscribe(source, url) {
+    if (confirm("Are you sure you would like to unsubscribe from " + source  + " ?")) {
         client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
             getId(url).remove();
         });

@@ -37,7 +37,8 @@ import static com.tanza.rufus.feed.FeedConstants.*;
 /**
  * Resource for {@link Article} related processing.
  *
- * All endpoints supporting anonymous user sessions return data
+ * All methods with an {@link Optional<User>} method parameter denote endpoints
+ * supporting anonymous user sessions; data from these endpoints are generated
  * from the collection of {@link FeedConstants#STARTER_FEEDS}.
  *
  * @author jtanza

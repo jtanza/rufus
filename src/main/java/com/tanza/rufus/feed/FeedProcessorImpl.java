@@ -25,10 +25,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+import static com.tanza.rufus.feed.FeedConstants.PUB_USER_KEY;
+
 public class FeedProcessorImpl implements FeedProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FeedProcessorImpl.class);
 
-    private static final long PUB_USER_KEY = Long.MIN_VALUE;
     private static final int MAX_CACHE = 1_000;
     private static final int TTL = 3;
 
@@ -144,7 +145,7 @@ public class FeedProcessorImpl implements FeedProcessor {
         try {
             docMap = articleCache.get(userId);
         } catch (ExecutionException e) {
-            logger.error("could not load cache for user {}, loading articles..", userId);
+            logger.error("could not load cache for user {}, rebuilding article map..", userId);
             docMap = buildChannelMap(userId);
         }
         return docMap;
@@ -158,15 +159,13 @@ public class FeedProcessorImpl implements FeedProcessor {
             requests = articleDao.getPublicSources()
                 .stream().collect(Collectors.toList())
                 .stream().map(RufusFeed::generate).collect(Collectors.toList());
-
-        } else {
-            if (!articleDao.hasSubscriptions(userId)) {
-                return Collections.emptyMap();
-            }
+        } else if (articleDao.hasSubscriptions(userId)) {
             requests = articleDao.getSources(userId)
                 .stream().collect(Collectors.toList())
                 .stream().map(RufusFeed::generate)
                 .collect(Collectors.toList());
+        } else {
+            return Collections.emptyMap();
         }
 
         requests.forEach(r -> {
