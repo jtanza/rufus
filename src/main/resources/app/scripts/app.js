@@ -224,7 +224,17 @@ function userFeeds() {
 function unsubscribe(source, url) {
     if (confirm("Are you sure you would like to unsubscribe from " + source  + " ?")) {
         client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
-            getId(url).remove();
+            getId(source).remove();
+        }, function (resp) {
+            genericErrorPage(resp);
         });
     }
+}
+
+function setFrontpage(url) {
+    var path = (getId(url).checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
+    client.put(path, url, 'application/json;charset=UTF-8', function (resp) {
+    }, function (resp) {
+        genericErrorPage(resp);
+    });
 }

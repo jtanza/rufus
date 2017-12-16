@@ -6,6 +6,7 @@ import com.tanza.rufus.db.SourceMapper;
 import com.tanza.rufus.feed.FeedUtils;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 

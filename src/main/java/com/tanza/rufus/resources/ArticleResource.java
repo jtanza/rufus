@@ -15,8 +15,6 @@ import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
-import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,6 +117,14 @@ public class ArticleResource {
         return Response.ok(tags).build();
     }
 
+    @Path("/isBookmarked")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
+    public Response isBookmarked(@Auth User user, Article article) {
+        user = userDao.findByEmail(user.getEmail());
+        return Response.ok(articleDao.getBookmarked(user.getId()).contains(article)).build();
+    }
+
     @Path("/bookmark")
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
@@ -129,14 +135,6 @@ public class ArticleResource {
         }
         articleDao.bookmarkArticle(user.getId(), article);
         return Response.ok().build();
-    }
-
-    @Path("/isBookmarked")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @GET
-    public Response isBookmarked(@Auth User user, Article article) {
-        user = userDao.findByEmail(user.getEmail());
-        return Response.ok(articleDao.getBookmarked(user.getId()).contains(article)).build();
     }
 
     @Path("/removeBookmark")
@@ -165,16 +163,34 @@ public class ArticleResource {
         return Response.ok(FeedResponse.formatMessage(parser.parse(user, feeds))).build();
     }
 
-    @Path("/frontpageNew")
+    @Path("/setFrontpage")
     @Consumes(MediaType.APPLICATION_JSON)
-    @POST
-    public Response addFrontpage(@Auth User user, Source source) {
-        if (StringUtils.isBlank(source.getUrl().toString())) {
-            throw new BadRequestException();
-        }
+    @PUT
+    public Response setFrontpage(@Auth User user, String url) {
         user = userDao.findByEmail(user.getEmail());
-        articleDao.setFrontpage(user.getId(), source);
-        return Response.ok().build();
+        try {
+            Source source = new Source(new URL(url));
+            articleDao.setFrontpage(user.getId(), source);
+            processor.invalidateCache(user.getId());
+            return Response.ok().build();
+        } catch (MalformedURLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @Path("/removeFrontpage")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @PUT
+    public Response removeFrontpage(@Auth User user, String url) {
+        user = userDao.findByEmail(user.getEmail());
+        try {
+            Source source = new Source(new URL(url));
+            articleDao.removeFrontpage(user.getId(), source);
+            processor.invalidateCache(user.getId());
+            return Response.ok().build();
+        } catch (MalformedURLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @Path("sources")
@@ -198,10 +214,12 @@ public class ArticleResource {
     @Path("unsubscribe")
     @PUT
     public Response unsubscribe(@Auth User user, String url) {
+        user = userDao.findByEmail(user.getEmail());
         try {
             URL parseUrl = new URL(url); //ensure arg is a valid url
             parseUrl.toURI();
             articleDao.removeSource(url);
+            processor.invalidateCache(user.getId());
             return Response.ok().build();
         } catch (MalformedURLException | URISyntaxException e) {
             throw new BadRequestException(e.getMessage());
