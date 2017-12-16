@@ -1,6 +1,5 @@
 //home grown http lib
 var http = function () {
-
     this.get = function(url, success, error) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function () {
@@ -19,7 +18,6 @@ var http = function () {
         }
         request.send();
     };
-
     this.post = function(url, data, contentType, success, error) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function () {
@@ -41,7 +39,6 @@ var http = function () {
         }
         request.send(data);
     };
-
     this.put = function(url, data, contentType, success, error) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function () {
@@ -158,16 +155,12 @@ function waitForElement(id, callback) {
 
     router.on('settings', function (params, query) {
         generateHTML('pages/settings.html', 'content');
-        waitForElement('manageFeeds', function () {
-            getId('manageFeeds').addEventListener('click', function () {
-                client.get('pages/sources.mustache', function (template) {
-                    Mustache.parse(template);
-                    client.get('api/articles/userFeeds', function (resp) {
-                        getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
-                    }, function(resp) {
-                        genericErrorPage(resp);
-                    });
-                });
+        client.get('pages/sources.mustache', function (template) {
+            Mustache.parse(template);
+            client.get('api/articles/userFeeds', function (resp) {
+                getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
+            }, function(resp) {
+                genericErrorPage(resp);
             });
         });
     });
@@ -234,21 +227,10 @@ function searchKeyPress(e) {
     return true;
 }
 
-function userFeeds() {
-    client.get('pages/sources.mustache', function (template) {
-        Mustache.parse(template);
-        client.get('api/articles/userFeeds', function (resp) {
-            getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
-        }, function(resp) {
-            genericErrorPage(resp);
-        }); 
-    });
-}
-
 function unsubscribe(source, url) {
     if (confirm("Are you sure you would like to unsubscribe from " + source  + " ?")) {
         client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
-            getId(source).remove();
+            getId('source-feed-section').remove();
         }, function (resp) {
             genericErrorPage(resp);
         });
@@ -256,7 +238,7 @@ function unsubscribe(source, url) {
 }
 
 function setFrontpage(url) {
-    var path = (getId(url).checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
+    var path = (getId('frontpage-check').checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
     client.put(path, url, 'application/json;charset=UTF-8', function (resp) {
     }, function (resp) {
         genericErrorPage(resp);

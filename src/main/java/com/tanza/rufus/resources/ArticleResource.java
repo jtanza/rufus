@@ -155,6 +155,7 @@ public class ArticleResource {
     }
 
     @Path("/new")
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
         if (feeds.isEmpty()) {
