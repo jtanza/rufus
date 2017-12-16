@@ -97,6 +97,15 @@ function genericErrorPage(errorResponse) {
     });
 }
 
+function waitForElement(id, callback) {
+    var wait = setInterval(function() {
+        if (getId(id)) {
+            clearInterval(wait);
+            callback();
+        }
+    }, 100);
+}
+
 //page rendering
 (function() {
     window.addEventListener("load", function() {
@@ -139,7 +148,6 @@ function genericErrorPage(errorResponse) {
         'about'     : () => {generateHTML('pages/about.html', 'content')},
         'login'     : () => {generateHTML('pages/login.html', 'content')},
         'register'  : () => {generateHTML('pages/register.html', 'content')},
-        'settings'  : () => {generateHTML('pages/settings.html', 'content')},
         'add'       : () => {generateHTML('pages/addFeeds.html', 'content')},
         'error'     : () => {generateHTML('pages/error.html', 'content')}
     });
@@ -147,6 +155,22 @@ function genericErrorPage(errorResponse) {
     router.on('tagged', function(params, query) {
         generateHTML('api/articles/tagged?tag=' + query, 'content');
     }).resolve();
+
+    router.on('settings', function (params, query) {
+        generateHTML('pages/settings.html', 'content');
+        waitForElement('manageFeeds', function () {
+            getId('manageFeeds').addEventListener('click', function () {
+                client.get('pages/sources.mustache', function (template) {
+                    Mustache.parse(template);
+                    client.get('api/articles/userFeeds', function (resp) {
+                        getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
+                    }, function(resp) {
+                        genericErrorPage(resp);
+                    });
+                });
+            });
+        });
+    });
 
     router.resolve();
 })();
