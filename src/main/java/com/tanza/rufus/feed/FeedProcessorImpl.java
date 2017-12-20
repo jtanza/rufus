@@ -64,48 +64,48 @@ public class FeedProcessorImpl implements FeedProcessor {
     @Override
     public List<Article> buildArticleCollection(User user) {
         long userId = user.getId();
-        return articlesFromChannelMap(userId, getChannelMap(userId), 0);
+        return articlesFromChannelMap(userId, getChannelMap(userId), false);
     }
 
     @Override
     public List<Article> buildArticleCollection() {
-        return articlesFromChannelMap(PUB_USER_KEY, getChannelMap(PUB_USER_KEY), 0);
+        return articlesFromChannelMap(PUB_USER_KEY, getChannelMap(PUB_USER_KEY), false);
     }
 
     @Override
-    public List<Article> buildTagCollection(User user, String tag, int docsPerChannel) {
+    public List<Article> buildTagCollection(User user, String tag) {
         long userId = user.getId();
         Map<Channel, List<Document>> tagged =
             getChannelMap(userId).entrySet().stream()
                 .filter(e -> e.getKey().getSource().getTags().contains(tag))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        return articlesFromChannelMap(userId, tagged, docsPerChannel);
+        return articlesFromChannelMap(userId, tagged, true);
     }
 
     @Override
-    public List<Article> buildTagCollection(String tag, int docsPerChannel) {
+    public List<Article> buildTagCollection(String tag) {
         Map<Channel, List<Document>> tagged =
             getChannelMap(PUB_USER_KEY).entrySet().stream()
                 .filter(e -> e.getKey().getSource().getTags().contains(tag))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        return articlesFromChannelMap(PUB_USER_KEY, tagged, docsPerChannel);
+        return articlesFromChannelMap(PUB_USER_KEY, tagged, true);
     }
 
     @Override
-    public List<Article> buildFrontpageCollection(User user, int docsPerChannel) {
+    public List<Article> buildFrontpageCollection(User user) {
         long userId = user.getId();
         Map<Channel, List<Document>> frontpage = getChannelMap(userId).entrySet().stream()
                 .filter(e -> e.getKey().getSource().isFrontpage())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        return articlesFromChannelMap(userId, frontpage, docsPerChannel);
+        return articlesFromChannelMap(userId, frontpage, true);
     }
 
     @Override
-    public List<Article> buildFrontpageCollection(int docsPerChannel) {
+    public List<Article> buildFrontpageCollection() {
         Map<Channel, List<Document>> tagged = getChannelMap(PUB_USER_KEY).entrySet().stream()
             .filter(e -> e.getKey().getSource().isFrontpage())
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        return articlesFromChannelMap(PUB_USER_KEY, tagged, docsPerChannel);
+        return articlesFromChannelMap(PUB_USER_KEY, tagged, true);
     }
 
     @Override
@@ -113,32 +113,18 @@ public class FeedProcessorImpl implements FeedProcessor {
         articleCache.invalidate(userId);
     }
 
-    private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap, int articleLimit) {
+    private List<Article> articlesFromChannelMap(long userId, Map<Channel, List<Document>> channelMap, boolean limit) {
         if (MapUtils.isEmpty(channelMap)) {
             return Collections.emptyList();
         }
-
         List<Article> articles = new ArrayList<>();
-        Set<Article> bookmarks = articleDao.getBookmarked(userId);
-
-        if (articleLimit > 0) {
-            channelMap.entrySet().forEach(e ->
-                articles.addAll(
-                    e.getValue().stream().limit(articleLimit).map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
-                )
-            );
-        } else {
-            channelMap.entrySet().forEach(e ->
-                articles.addAll(
-                    e.getValue().stream().map(d -> Article.of(e.getKey(), d)).collect(Collectors.toList())
-                )
-            );
+        if (limit) {
+            channelMap.entrySet().forEach(c -> channelMap.put(c.getKey(), c.getValue().stream().limit(FeedConstants.DEFAULT_DOCS_PER_FEED).collect(Collectors.toList())));
         }
-
-        FeedUtils.markBookmarks(articles, bookmarks);
+        channelMap.entrySet().forEach(e -> articles.addAll(Article.of(e.getKey(), e.getValue().stream().collect(Collectors.toList()))));
+        FeedUtils.markBookmarks(articles, articleDao.getBookmarked(userId));
         return FeedUtils.sort(articles);
     }
-
 
     private Map<Channel, List<Document>> getChannelMap(long userId) {
         Map<Channel, List<Document>> docMap;
@@ -156,12 +142,10 @@ public class FeedProcessorImpl implements FeedProcessor {
         List<RufusFeed> requests;
 
         if (userId == PUB_USER_KEY) {
-            requests = articleDao.getPublicSources()
-                .stream().collect(Collectors.toList())
+            requests = articleDao.getPublicSources().stream().collect(Collectors.toList())
                 .stream().map(RufusFeed::generate).collect(Collectors.toList());
         } else if (articleDao.hasSubscriptions(userId)) {
-            requests = articleDao.getSources(userId)
-                .stream().collect(Collectors.toList())
+            requests = articleDao.getSources(userId).stream().collect(Collectors.toList())
                 .stream().map(RufusFeed::generate)
                 .collect(Collectors.toList());
         } else {
@@ -169,13 +153,13 @@ public class FeedProcessorImpl implements FeedProcessor {
         }
 
         requests.forEach(r -> {
-            Pair<SyndFeed, List<SyndEntry>> synd =  feedPair(r);
+            Pair<SyndFeed, List<SyndEntry>> synd = feedPair(r);
             ret.put(Channel.of(
                 synd.getKey().getTitle(),
                 synd.getKey().getLanguage(),
                 synd.getKey().getLink(),
                 r.getSource()),
-                extractDocuments(synd, true));
+                extractDocuments(synd));
         });
         return ret;
     }
@@ -186,21 +170,21 @@ public class FeedProcessorImpl implements FeedProcessor {
         return ImmutablePair.of(feed, feed.getEntries());
     }
 
-    private static List<Document> extractDocuments(Pair<SyndFeed, List<SyndEntry>> feedEntry, boolean truncateDescriptions) {
+    private static List<Document> extractDocuments(Pair<SyndFeed, List<SyndEntry>> feedEntry) {
         List<Document> ret = new ArrayList<>();
         feedEntry.getRight().forEach(e -> {
             FeedUtils.mergeAuthors(e);
             String description = e.getDescription() != null ? FeedUtils.clean(e.getDescription().getValue()) : StringUtils.EMPTY;
-            if (truncateDescriptions) {
+            if (description.length() > FeedConstants.MAX_DESCRIP_LEN) {
                 description = FeedUtils.truncate(description, FeedConstants.MAX_DESCRIP_LEN);
             }
             ret.add(Document.of(
-                    StringEscapeUtils.unescapeHtml4(e.getTitle()),
-                    e.getPublishedDate(),
-                    e.getAuthors(),
-                    description,
-                    e.getLink(),
-                    feedEntry.getLeft().getTitle()
+                StringEscapeUtils.unescapeHtml4(e.getTitle()),
+                e.getPublishedDate(),
+                e.getAuthors(),
+                description,
+                e.getLink(),
+                feedEntry.getLeft().getTitle()
             ));
         });
         return ret;

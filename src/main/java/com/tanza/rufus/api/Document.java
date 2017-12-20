@@ -4,7 +4,6 @@ import com.sun.syndication.feed.synd.SyndEntry;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Encapsulation of meta data pulled from a {@link SyndEntry}.
@@ -21,12 +20,12 @@ public class Document {
     private String channelTitle;
 
     private Document(String title, Date publicationDate, List authors, String description, String url, String channelTitle) {
-        this.title = Objects.requireNonNull(title, "title must not be null!");
-        this.publicationDate = Objects.requireNonNull(publicationDate, "pub date must not be null!");
-        this.authors = Objects.requireNonNull(authors, "authors must not be null");
-        this.description = Objects.requireNonNull(description, "description must not be null");
-        this.url = Objects.requireNonNull(url, "url must not ne null");
-        this.channelTitle = Objects.requireNonNull(channelTitle, "channel title must not ne null");
+        this.title = title;
+        this.publicationDate = publicationDate;
+        this.authors = authors;
+        this.description = description;
+        this.url = url;
+        this.channelTitle = channelTitle;
     }
 
     public static Document of(String title, Date publicationDate, List authors, String description, String link, String channelTitle) {

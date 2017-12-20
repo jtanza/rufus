@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -29,8 +28,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static com.tanza.rufus.feed.FeedConstants.*;
 
 /**
  * Resource for {@link Article} related processing.
@@ -68,8 +65,8 @@ public class ArticleResource {
     @GET
     public Response frontPage(@Auth Optional<User> user) {
         return user.isPresent()
-            ? articleView(() -> processor.buildFrontpageCollection(user.get(), DEFAULT_DOCS_PER_FEED))
-            : articleView(() -> processor.buildFrontpageCollection(DEFAULT_DOCS_PER_FEED));
+            ? articleView(() -> processor.buildFrontpageCollection(user.get()))
+            : articleView(processor::buildFrontpageCollection);
     }
 
     @Path("/all")
@@ -86,8 +83,8 @@ public class ArticleResource {
     @GET
     public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
         return user.isPresent()
-            ? articleView(() -> processor.buildTagCollection(user.get(), tag, DEFAULT_DOCS_PER_FEED))
-            : articleView(() -> processor.buildTagCollection(tag, DEFAULT_DOCS_PER_FEED));
+            ? articleView(() -> processor.buildTagCollection(user.get(), tag))
+            : articleView(() -> processor.buildTagCollection(tag));
     }
 
     @Path("/tagStubs")
@@ -131,7 +128,7 @@ public class ArticleResource {
     public Response bookmark(@Auth User user, Article article) {
         user = userDao.findByEmail(user.getEmail());
         if (articleDao.getBookmarked(user.getId()).contains(article)) {
-            throw new BadRequestException("Article is already bookmarked!");
+            return ResourceUtils.badRequest("Article is already bookmarked.");
         }
         articleDao.bookmarkArticle(user.getId(), article);
         return Response.ok().build();
@@ -159,7 +156,7 @@ public class ArticleResource {
     @POST
     public Response addFeed(@Auth User user, List<String> feeds) {
         if (feeds.isEmpty()) {
-            throw new BadRequestException();
+            return ResourceUtils.badRequest("No feeds provided.");
         }
         return Response.ok(FeedResponse.formatMessage(parser.parse(user, feeds))).build();
     }
@@ -175,7 +172,7 @@ public class ArticleResource {
             processor.invalidateCache(user.getId());
             return Response.ok().build();
         } catch (MalformedURLException e) {
-            throw new BadRequestException(e.getMessage());
+            return ResourceUtils.badRequest(e.getMessage());
         }
     }
 
@@ -190,7 +187,7 @@ public class ArticleResource {
             processor.invalidateCache(user.getId());
             return Response.ok().build();
         } catch (MalformedURLException e) {
-            throw new BadRequestException(e.getMessage());
+            return ResourceUtils.badRequest(e.getMessage());
         }
     }
 
@@ -223,7 +220,7 @@ public class ArticleResource {
             processor.invalidateCache(user.getId());
             return Response.ok().build();
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new BadRequestException(e.getMessage());
+            return ResourceUtils.badRequest(e.getMessage());
         }
     }
 

@@ -47,7 +47,7 @@ public class UserResource {
     @POST
     public Response login(@FormDataParam("email") String email, @FormDataParam("password") String password) {
         if (!UserUtils.valid(email, password)) {
-            return Response.status(Status.BAD_REQUEST).build();
+            return ResourceUtils.badRequest("username /email empty or invalid");
         }
         Optional<User> optional = authenticator.authenticate(email, password);
         if (optional.isPresent()) {
@@ -66,17 +66,9 @@ public class UserResource {
         String pw = newUser.getPassword();
 
         if (!UserUtils.valid(email, pw)) {
-            return Response.status(Status.BAD_REQUEST)
-                .type(MediaType.TEXT_PLAIN)
-                .entity("username or email empty")
-                .build();
-        }
-
-        if (userDao.findByEmail(email) != null) {
-            return Response.status(Status.BAD_REQUEST)
-                .type(MediaType.TEXT_PLAIN)
-                .entity("a user with that email address already exists")
-                .build();
+            return ResourceUtils.badRequest("username /email empty or invalid");
+        } else if (userDao.findByEmail(email) != null) {
+            return ResourceUtils.badRequest("A user with that email address already exists");
         }
 
         User user = new User(email, AuthUtils.hashPassword(pw));

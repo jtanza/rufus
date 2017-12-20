@@ -1,16 +1,23 @@
 package com.tanza.rufus.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tanza.rufus.feed.FeedProcessorImpl;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class Article implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LoggerFactory.getLogger(Article.class);
 
     private String title;
     private Date publicationDate;
@@ -33,8 +40,16 @@ public class Article implements Serializable {
         this.channelUrl = Objects.requireNonNull(channelUrl, "channel url must not be null");
     }
 
-    public static Article of(Channel c, Document d) {
-        return new Article(d.getTitle(), d.getPublicationDate(), d.getAuthors(), d.getDescription(), d.getUrl(), d.getChannelTitle(), c.getUrl());
+    public static List<Article> of(Channel c, Collection<Document> documents) {
+        List<Article> articles = new ArrayList<>();
+        documents.forEach(d -> {
+            try {
+                articles.add(new Article(d.getTitle(), d.getPublicationDate(), d.getAuthors(), d.getDescription(), d.getUrl(), d.getChannelTitle(), c.getUrl()));
+            } catch (NullPointerException e) {
+                logger.debug("null value for document {}, discarding... {}", c.getTitle(), e);
+            }
+        });
+        return articles;
     }
 
     public String getTitle() {

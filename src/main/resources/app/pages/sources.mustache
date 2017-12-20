@@ -13,22 +13,22 @@
     </thead>
     <tbody>
     {{#sources}}
-        <tr id="source-feed-section">
+        <tr id={{url}}>
             <td><a href={{url}}>{{sourceName}}</a></td>
             <td>
                 <label class="frontpage-checkbox">
                     {{#frontpage}}
-                        <input type="checkbox" checked onclick="setFrontpage(this.getAttribute('data-value'))" id="frontpage-check" data-value={{url}}>
+                        <input type="checkbox" checked onclick="setFrontpage(this.getAttribute('data-value'), this.getAttribute('data-id'))" id={{guid}} data-value={{url}} data-id={{guid}}>
                     {{/frontpage}}
                     {{^frontpage}}
-                        <input type="checkbox" onclick="setFrontpage(this.getAttribute('data-value'))" id=frontpage-check data-value={{url}}>
+                        <input type="checkbox" onclick="setFrontpage(this.getAttribute('data-value'), this.getAttribute('data-id'))" id={{guid}} data-value={{url}} data-id={{guid}}>
                     {{/frontpage}}
                     <span class="label-body"></span>
                 </label>
             </td>
             <td>
                 <label class="unsubscribe-action">
-                    <a onclick="unsubscribe(this.getAttribute('data-value'))" data-value={{url}}>
+                    <a data-value={{url}} data-name={{sourceName}} onclick="unsubscribe(this.getAttribute('data-value'), this.getAttribute('data-name'))">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
                     </a>
                 </label>

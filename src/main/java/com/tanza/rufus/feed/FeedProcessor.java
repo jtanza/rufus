@@ -39,39 +39,35 @@ public interface FeedProcessor {
      *
      * @param user
      * @param tag
-     * @param docsPerChannel
      * @return
      */
-    List<Article> buildTagCollection(User user, String tag, int docsPerChannel);
+    List<Article> buildTagCollection(User user, String tag);
 
     /**
      * Loads public {@link Article}s from public {@link Source}s
      * matching the requested {@param tag}.
      *
      * @param tag
-     * @param docsPerChannel
      * @return
      */
-    List<Article> buildTagCollection(String tag, int docsPerChannel);
+    List<Article> buildTagCollection(String tag);
 
     /**
      * Generates a collection of public {@link Article}s which have
      * been denoted for display on the "Front Page" of the client.
      *
      * @param user
-     * @param docsPerChannel
      * @return
      */
-    List<Article> buildFrontpageCollection(User user, int docsPerChannel);
+    List<Article> buildFrontpageCollection(User user);
 
     /**
      * Generates a collection of public {@link Article}s which have
      * been denoted for display on the "Front Page" of the client.
      *
-     * @param docsPerChannel
      * @return
      */
-    List<Article> buildFrontpageCollection(int docsPerChannel);
+    List<Article> buildFrontpageCollection();
 
     /**
      * Immediately invalidates an {@link User}s current standing {@link LoadingCache} containing

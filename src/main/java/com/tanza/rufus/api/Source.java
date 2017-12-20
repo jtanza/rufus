@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A {@link Source} is the internal representation of a web feed (RSS)
@@ -61,11 +62,13 @@ public class Source implements Serializable {
         private final String sourceName;
         private final String url;
         private final boolean frontpage;
+        private final String guid;
 
         private ClientSource(String sourceName, String url, boolean frontpage) {
             this.sourceName = sourceName;
             this.url = url;
             this.frontpage = frontpage;
+            this.guid = UUID.randomUUID().toString();
         }
 
         public static ClientSource ofExisting(Source source) {
@@ -83,6 +86,10 @@ public class Source implements Serializable {
 
         public boolean isFrontpage() {
             return frontpage;
+        }
+
+        public String getGuid() {
+            return guid;
         }
     }
 }

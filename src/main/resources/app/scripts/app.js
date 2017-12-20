@@ -227,20 +227,21 @@ function searchKeyPress(e) {
     return true;
 }
 
-function unsubscribe(source, url) {
+function unsubscribe(url, source) {
     if (confirm("Are you sure you would like to unsubscribe from " + source  + " ?")) {
         client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
-            getId('source-feed-section').remove();
+            getId(url).remove();
         }, function (resp) {
             genericErrorPage(resp);
         });
     }
 }
 
-function setFrontpage(url) {
-    var path = (getId('frontpage-check').checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
+function setFrontpage(url, id) {
+    var path = (getId(id).checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
     client.put(path, url, 'application/json;charset=UTF-8', function (resp) {
     }, function (resp) {
         genericErrorPage(resp);
     });
 }
+
