@@ -8,6 +8,7 @@ import com.tanza.rufus.auth.TokenGenerator;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
+import com.tanza.rufus.feed.FeedConstants;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessorImpl;
 import com.tanza.rufus.resources.ArticleResource;
@@ -32,9 +33,11 @@ import org.jose4j.keys.HmacKey;
 import org.skife.jdbi.v2.DBI;
 
 public class RufusApplication extends Application<RufusConfiguration> {
+    private static final byte[] VERIFICATION_KEY = System.getProperty(FeedConstants.JWT_PROPERTY).getBytes();
     private static final String DB_SOURCE = "postgresql";
-    //TODO
-    private static final byte[] VERIFICATION_KEY = "super_secret_key_change_me_asap".getBytes();
+    private static final String BEARER = "bearer";
+    private static final String REALM = "realm";
+    private static final String ROOT_PATH = "/api/*";
 
     public static void main(String[] args) throws Exception {
         new RufusApplication().run(args);
@@ -55,24 +58,21 @@ public class RufusApplication extends Application<RufusConfiguration> {
 
     @Override
     public void run(RufusConfiguration conf, Environment env) throws Exception {
-        //db
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(env, conf.getDataSourceFactory(), DB_SOURCE);
 
-        //daos
         final UserDao userDao = jdbi.onDemand(UserDao.class);
         final ArticleDao articleDao = jdbi.onDemand(ArticleDao.class);
 
         final FeedProcessorImpl processor = FeedProcessorImpl.newInstance(articleDao);
         final FeedParser parser = new FeedParser(articleDao, processor);
 
-        //jwt config
         final JwtConsumer jwtConsumer = new JwtConsumerBuilder()
             .setAllowedClockSkewInSeconds(30)
             .setRequireExpirationTime()
             .setRequireSubject()
             .setVerificationKey(new HmacKey(VERIFICATION_KEY))
-            .setRelaxVerificationKeyValidation() //TODO potentially remove
+            .setRelaxVerificationKeyValidation()
             .build();
         final CachingJwtAuthenticator<User> cachingJwtAuthenticator = new CachingJwtAuthenticator<>(
             env.metrics(),
@@ -80,7 +80,6 @@ public class RufusApplication extends Application<RufusConfiguration> {
             conf.getAuthenticationCachePolicy()
         );
 
-        //resources
         env.jersey().register(new ArticleResource(userDao, articleDao, processor, parser));
         env.jersey().register(
             new UserResource(
@@ -92,15 +91,14 @@ public class RufusApplication extends Application<RufusConfiguration> {
         );
 
         //route source
-        env.jersey().setUrlPattern("/api/*");
+        env.jersey().setUrlPattern(ROOT_PATH);
 
-        //auth
         env.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
         env.jersey().register(new AuthDynamicFeature(
             new JwtAuthFilter.Builder<User>()
                 .setJwtConsumer(jwtConsumer)
-                .setRealm("realm")
-                .setPrefix("bearer")
+                .setRealm(REALM)
+                .setPrefix(BEARER)
                 .setAuthenticator(cachingJwtAuthenticator)
                 .buildAuthFilter()
         ));
