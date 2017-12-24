@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +68,18 @@ public class FeedUtils {
      */
     public static boolean isNull(Collection<?> collection) {
         return collection.stream().allMatch(e -> e == null);
+    }
+
+    public static List<Source> getPublicSources() {
+        List<Source> sources = new ArrayList<>();
+        for (String s : FeedConstants.STARTER_FEEDS.values()) {
+            try {
+                sources.add(new Source(new URL(s)));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        return sources;
     }
 }
 
