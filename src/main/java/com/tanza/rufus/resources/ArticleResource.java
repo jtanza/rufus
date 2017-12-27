@@ -61,7 +61,7 @@ public class ArticleResource {
     }
 
     @Path("/frontpage")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     @GET
     public Response frontPage(@Auth Optional<User> user) {
         return user.isPresent()
@@ -70,7 +70,7 @@ public class ArticleResource {
     }
 
     @Path("/all")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     @GET
     public Response all(@Auth Optional<User> user) {
         return  user.isPresent()
@@ -79,7 +79,7 @@ public class ArticleResource {
     }
 
     @Path("/tagged")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     @GET
     public Response byTag(@Auth Optional<User> user, @QueryParam("tag") String tag) {
         return user.isPresent()
@@ -114,14 +114,6 @@ public class ArticleResource {
         return Response.ok(tags).build();
     }
 
-    @Path("/isBookmarked")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @GET
-    public Response isBookmarked(@Auth User user, Article article) {
-        user = userDao.findByEmail(user.getEmail());
-        return Response.ok(articleDao.getBookmarked(user.getId()).contains(article)).build();
-    }
-
     @Path("/bookmark")
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
@@ -144,7 +136,7 @@ public class ArticleResource {
     }
 
     @Path("/bookmarked")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
     @GET
     public Response bookmarked(@Auth User user) {
         final User u = userDao.findByEmail(user.getEmail());

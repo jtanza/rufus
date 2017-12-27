@@ -5,6 +5,8 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import com.tanza.rufus.feed.FeedParser;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collections;
@@ -17,6 +19,8 @@ import java.util.Collections;
  */
 
 public class RufusFeed {
+    private static final Logger logger = LoggerFactory.getLogger(RufusFeed.class);
+
     private final Source source;
     private final SyndFeed feed;
 
@@ -32,9 +36,8 @@ public class RufusFeed {
         try {
             feed = input.build(new XmlReader(url));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Could not build SyndFeedInput for {}", url, e);
         }
-
         if (CollectionUtils.isEmpty(source.getTags())) {
             source.setTags(Collections.emptyList()); //never null!
         }
@@ -49,7 +52,6 @@ public class RufusFeed {
     public SyndFeed getFeed() {
         return feed;
     }
-
 }
 
 
