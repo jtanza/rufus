@@ -1,4 +1,6 @@
-//home grown http lib
+/*
+  Utility functions. 
+ */
 var http = function () {
     this.get = function(url, success, error) {
         var request = new XMLHttpRequest();
@@ -11,10 +13,10 @@ var http = function () {
                 }
             }
         };
-        request.open('GET', url);
+        request.open("GET", url);
         var token = getStoredToken();
         if (token) {
-            request.setRequestHeader('Authorization', 'Bearer ' + token);
+            request.setRequestHeader("Authorization", "Bearer " + token);
         }
         request.send();
     };
@@ -29,7 +31,7 @@ var http = function () {
                 }
             }
         };
-        request.open('POST', url);
+        request.open("POST", url);
         if (contentType) {
             request.setRequestHeader("Content-Type", contentType);
         }
@@ -50,7 +52,7 @@ var http = function () {
                 }
             }
         };
-        request.open('PUT', url);
+        request.open("PUT", url);
         if (contentType) {
             request.setRequestHeader("Content-Type", contentType);
         }
@@ -67,11 +69,11 @@ function getId(id) {
 }
 
 function storeToken(resp) {
-    sessionStorage.setItem('jwt_token', resp);
+    sessionStorage.setItem("jwt_token", resp);
 }
 
 function getStoredToken() {
-    return sessionStorage.getItem('jwt_token')
+    return sessionStorage.getItem("jwt_token");
 }
 
 function generateHTML(url, id) {
@@ -83,82 +85,91 @@ function generateHTML(url, id) {
 }
 
 function genericErrorPage(errorResponse) {
-    client.get('pages/error.html', function(resp) {
+    client.get("pages/error.html", function(resp) {
         Mustache.parse(resp);
-        getId('content').innerHTML = Mustache.render(resp, {
+        getId("content").innerHTML = Mustache.render(resp, {
             errCode: errorResponse.status
         });
     }, function(resp) {
-        console.log("ruh-oh could not fetch error page, letting errors crop up to client");
+        console.log("ruh-oh could not fetch error page, letting errors crop up to client " + resp);
         window.location.reload();
     });
 }
 
-function waitForElement(id, callback) {
-    var wait = setInterval(function() {
-        if (getId(id)) {
-            clearInterval(wait);
-            callback();
-        }
-    }, 100);
-}
-
-//page rendering
+/*
+  Page rendering: initial app state, path routing etc.
+ */
 (function() {
     window.addEventListener("load", function() {
         //load tags
-        var template = getId('tags-template').innerHTML;
+        var template = getId("tags-template").innerHTML;
         Mustache.parse(template);
-        client.get('api/articles/tagStubs', function (resp) {
-            getId('tags').innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
+        client.get("api/articles/tagStubs", function (resp) {
+            getId("tags").innerHTML = Mustache.render(template, {tags: JSON.parse(resp)});
         }, function(resp) {
             genericErrorPage(resp);
         });
 
         //set login/logout based upon current session
         if (!getStoredToken()) {
-            getId('bookmarked').setAttribute('class', 'inactive-link');
-            getId('settings').setAttribute('class', 'inactive-link');
+            getId("bookmarked").setAttribute("class", "inactive-link");
+            getId("settings").setAttribute("class", "inactive-link");
         } else {
-            var login = getId('login');
-            login.innerHTML = 'Logout';
-            login.removeAttribute('href');
+            var login = getId("login");
+            login.innerHTML = "Logout";
+            login.removeAttribute("href");
             login.onclick = function() {
-                sessionStorage.removeItem('jwt_token');
+                sessionStorage.removeItem("jwt_token");
                 window.location.reload();
-            }
+            };
         }
     });
 
     //app routing
-    var router = new Navigo(null, true, '#!');
+    var router = new Navigo(null, true, "#!");
 
     //root view
     router.on(function () {
-        generateHTML('api/articles/frontpage', 'content');
+        generateHTML("api/articles/frontpage", "content");
     });
-    
+
     router.on({
-        'frontpage' : () => {generateHTML('api/articles/frontpage', 'content')},
-        'all'       : () => {generateHTML('api/articles/all', 'content')},
-        'bookmarked': () => {generateHTML('api/articles/bookmarked', 'content')},
-        'about'     : () => {generateHTML('pages/about.html', 'content')},
-        'login'     : () => {generateHTML('pages/login.html', 'content')},
-        'register'  : () => {generateHTML('pages/register.html', 'content')},
-        'add'       : () => {generateHTML('pages/addFeeds.html', 'content')},
-        'error'     : () => {generateHTML('pages/error.html', 'content')}
+        "frontpage" : function () {
+           generateHTML("api/articles/frontpage", "content");
+        },
+        "all" :  function () {
+            generateHTML("api/articles/all", "content");
+        },
+        "bookmarked": function () {
+            generateHTML("api/articles/bookmarked", "content")
+        },
+        "about" : function () {
+            generateHTML("pages/about.html", "content")
+        },
+        "login" : function () {
+            generateHTML("pages/login.html", "content")
+        },
+        "register" : function () {
+            generateHTML("pages/register.html", "content")
+        },
+        "add" : function () {
+            generateHTML("pages/addFeeds.html", "content")
+        },
+        "error" : function () {
+            generateHTML("pages/error.html", "content")
+        }
     });
-    
-    router.on('tagged', function(params, query) {
-        generateHTML('api/articles/tagged?tag=' + query, 'content');
+
+    router.on("tagged", function(params, query) {
+        generateHTML("api/articles/tagged?tag=" + query, "content");
     }).resolve();
 
-    router.on('settings', function (params, query) {
-        generateHTML('pages/settings.html', 'content');
-        client.get('pages/sources.mustache', function (template) {
+    router.on("settings", function (params, query) {
+        generateHTML("pages/settings.html", "content");
+        client.get("pages/sources.mustache", function (template) {
             Mustache.parse(template);
-            client.get('api/articles/userFeeds', function (resp) {
-                getId('settingsContent').innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
+            client.get("api/articles/userFeeds", function (resp) {
+                getId("settingsContent").innerHTML = Mustache.render(template, {sources: JSON.parse(resp)});
             }, function(resp) {
                 genericErrorPage(resp);
             });
@@ -168,13 +179,16 @@ function waitForElement(id, callback) {
     router.resolve();
 })();
 
+/*
+  User action functions, mostly executed through element onclick events
+ */
 function userLogin() {
     var formData = new FormData();
     formData.append("email", getId("emailInput").value);
     formData.append("password", getId("passwordInput").value);
-    client.post('api/user/login', formData, null, function(resp) {
+    client.post("api/user/login", formData, null, function(resp) {
         storeToken(resp);
-        window.location.assign('#!frontpage');
+        window.location.assign("#!frontpage");
         window.location.reload();
     }, function(resp) {
         genericErrorPage(resp);
@@ -183,21 +197,21 @@ function userLogin() {
 
 function registerUser() {
     var newUser = {};
-    newUser.email = getId('emailInput').value;
-    newUser.password = getId('passwordInput').value;
+    newUser.email = getId("emailInput").value;
+    newUser.password = getId("passwordInput").value;
 
     var starterFeeds = [];
     var inputs = document.getElementsByTagName("input");
-    for(var i = 0; i < inputs.length; i++) {
+    for (var i = 0; i < inputs.length; i++) {
         if(inputs[i].type == "checkbox" && inputs[i].checked) {
             starterFeeds.push(inputs[i].id);
         }
     }
     newUser.starterFeeds = starterFeeds;
 
-    client.post('api/user/new', JSON.stringify(newUser), 'application/json;charset=UTF-8', function(resp) {
+    client.post("api/user/new", JSON.stringify(newUser), "application/json;charset=UTF-8", function(resp) {
         storeToken(resp);
-        window.location.assign('#!frontpage');
+        window.location.assign("#!frontpage");
         window.location.reload();
     }, function(resp) {
         genericErrorPage(resp);
@@ -206,11 +220,11 @@ function registerUser() {
 
 //subscribe to new feeds
 function subscribe() {
-    var feeds = getId('subscriptionFeeds').value;
-    var feedData = JSON.stringify(feeds.split(' '));
-    client.post('api/articles/new', feedData, 'application/json;charset=UTF-8', function(resp) {
+    var feeds = getId("subscriptionFeeds").value;
+    var feedData = JSON.stringify(feeds.split(" "));
+    client.post("api/articles/new", feedData, "application/json;charset=UTF-8", function(resp) {
         alert(resp);
-        window.location.assign('#!add');
+        window.location.assign("#!add");
         window.location.reload();
     }, function (resp) {
         genericErrorPage(resp);
@@ -219,9 +233,9 @@ function subscribe() {
 
 //mock form enter behavior
 function searchKeyPress(e) {
-    e = e || window.event; //look for window.event in case event isn't passed in
+    e = e || window.event; //look for window.event in case event isn"t passed in
     if (e.keyCode == 13) {
-        getId('btnSearch').click();
+        getId("btnSearch").click();
         return false;
     }
     return true;
@@ -229,7 +243,7 @@ function searchKeyPress(e) {
 
 function unsubscribe(url, source) {
     if (confirm("Are you sure you would like to unsubscribe from " + source  + " ?")) {
-        client.put('api/articles/unsubscribe', url, 'application/json;charset=UTF-8', function (resp) {
+        client.put("api/articles/unsubscribe", url, "application/json;charset=UTF-8", function (resp) {
             getId(url).remove();
         }, function (resp) {
             genericErrorPage(resp);
@@ -238,8 +252,8 @@ function unsubscribe(url, source) {
 }
 
 function setFrontpage(url, id) {
-    var path = (getId(id).checked) ? 'api/articles/setFrontpage' : 'api/articles/removeFrontpage';
-    client.put(path, url, 'application/json;charset=UTF-8', function (resp) {
+    var path = (getId(id).checked) ? "api/articles/setFrontpage" : "api/articles/removeFrontpage";
+    client.put(path, url, "application/json;charset=UTF-8", function (resp) {
     }, function (resp) {
         genericErrorPage(resp);
     });
