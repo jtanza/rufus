@@ -15,6 +15,7 @@ import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,11 +195,12 @@ public class ArticleResource {
     @GET
     public Response userFeeds(@Auth User user) {
         user = userDao.findByEmail(user.getEmail());
-        List<ClientSource> sources = articleDao.getSources(user.getId())
-            .stream()
-            .map(ClientSource::ofExisting)
-            .collect(Collectors.toList());
-        return Response.ok(sources).build();
+        List<Source> sources = articleDao.getSources(user.getId());
+        if (FeedUtils.isNull(sources)) {
+            return Response.ok(Collections.emptyList()).build();
+        } else {
+            return Response.ok(sources.stream().map(ClientSource::ofExisting).collect(Collectors.toList())).build();
+        }
     }
 
     @Path("unsubscribe")

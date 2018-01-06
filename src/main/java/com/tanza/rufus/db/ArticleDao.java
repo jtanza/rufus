@@ -39,7 +39,7 @@ public interface ArticleDao {
     List<Source> getSources(@Bind("id") long id);
 
     @RegisterMapper(SourceMapper.class)
-    @SqlQuery("select * from public_sources")
+    @SqlQuery("select * from publicsources")
     List<Source> getPublicSources();
 
     @SqlUpdate("insert into sources(userid, source) values((select userid from rufususer where userid = :id), :source)")

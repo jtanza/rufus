@@ -15,7 +15,7 @@ CREATE TABLE articles (
     channelurl TEXT,
     authors ARRAY,
     CONSTRAINT pk_url PRIMARY KEY (userid, url),
-    FOREIGN KEY (userid) REFERENCES rufususer(userid)
+    FOREIGN KEY (userid) REFERENCES rufususer(userid) ON DELETE CASCADE
 );
 
 CREATE TABLE sources (
@@ -24,10 +24,10 @@ CREATE TABLE sources (
     frontpage BOOL DEFAULT false,
     tags ARRAY,
     CONSTRAINT pk_sources PRIMARY KEY (userid, source),
-    FOREIGN KEY (userid) REFERENCES rufususer(userid)
+    FOREIGN KEY (userid) REFERENCES rufususer(userid) ON DELETE CASCADE
 );
 
-CREATE TABLE public_sources (
+CREATE TABLE publicsources (
     source TEXT NOT NULL,
     frontpage BOOL DEFAULT false,
     tags ARRAY

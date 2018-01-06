@@ -62,6 +62,24 @@ var http = function () {
         }
         request.send(data);
     };
+    this.delete = function(url, success, error) {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function () {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    success(request.responseText);
+                } else {
+                    error(request);
+                }
+            }
+        };
+        request.open("DELETE", url);
+        var token = getStoredToken();
+        if (token) {
+            request.setRequestHeader("Authorization", "Bearer " + token);
+        }
+        request.send();
+    };
 }; var client = new http();
 
 function getId(id) {
@@ -74,6 +92,10 @@ function storeToken(resp) {
 
 function getStoredToken() {
     return sessionStorage.getItem("jwt_token");
+}
+
+function deleteStoredToken() {
+    sessionStorage.removeItem("jwt_token");
 }
 
 function generateHTML(url, id) {
@@ -118,10 +140,10 @@ function genericErrorPage(errorResponse) {
             var login = getId("login");
             login.innerHTML = "Logout";
             login.removeAttribute("href");
-            //logout
-            login.onclick = function() {
-                sessionStorage.removeItem("jwt_token");
-                window.location.href = '/#!all';
+            login.onclick = function() { //logout
+                deleteStoredToken();
+                window.location.assign("#!all");
+                window.location.reload();
             };
         }
     });
@@ -176,7 +198,6 @@ function genericErrorPage(errorResponse) {
             });
         });
     });
-
     router.resolve();
 })();
 
@@ -192,7 +213,8 @@ function userLogin() {
         window.location.assign("#!frontpage");
         window.location.reload();
     }, function(resp) {
-        genericErrorPage(resp);
+        console.log(resp);
+        alert(resp.response);
     });
 }
 
@@ -260,3 +282,14 @@ function setFrontpage(url, id) {
     });
 }
 
+function deleteUser() {
+    if (confirm("Are you sure you would like to delete your account?")) {
+        client.delete('api/user/deleteUser', function (resp) {
+            deleteStoredToken();
+            window.location.assign("#!all");
+            window.location.reload();
+        }, function (resp) {
+            genericErrorPage(resp);
+        });
+    }
+}

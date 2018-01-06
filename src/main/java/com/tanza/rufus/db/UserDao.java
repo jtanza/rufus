@@ -26,4 +26,8 @@ public interface UserDao {
     @RegisterMapper(UserMapper.class)
     @SqlUpdate("insert into rufususer (EMAIL, PASSWORD) values (:email, :password)")
     void addUser(@BindBean User user);
+
+    @RegisterMapper(UserMapper.class)
+    @SqlUpdate("DELETE FROM rufususer WHERE email = :email")
+    void deleteUser(@Bind("email") String email);
 }

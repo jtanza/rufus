@@ -10,15 +10,17 @@ import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
 import com.tanza.rufus.feed.FeedConstants;
 
+import io.dropwizard.auth.Auth;
 import org.apache.commons.collections.CollectionUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -47,14 +49,14 @@ public class UserResource {
     @POST
     public Response login(@FormDataParam("email") String email, @FormDataParam("password") String password) {
         if (!UserUtils.valid(email, password)) {
-            return ResourceUtils.badRequest("username /email empty or invalid");
+            return ResourceUtils.badRequest("Email or password empty or invalid.");
         }
         Optional<User> optional = authenticator.authenticate(email, password);
         if (optional.isPresent()) {
             //generate and return jwt token to client
             return Response.ok(tokenGenerator.generateToken(email)).build();
         } else {
-            return Response.status(Status.UNAUTHORIZED).build();
+            return ResourceUtils.badRequest("Wrong email or password.");
         }
     }
 
@@ -86,5 +88,12 @@ public class UserResource {
         }
 
         return Response.ok(tokenGenerator.generateToken(email)).build();
+    }
+
+    @Path("/deleteUser")
+    @DELETE
+    public Response deleteUser(@Auth User user) {
+        userDao.deleteUser(user.getEmail());
+        return Response.ok().build();
     }
 }
