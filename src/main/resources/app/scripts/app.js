@@ -283,7 +283,7 @@ function setFrontpage(url, id) {
 }
 
 function deleteUser() {
-    if (confirm("Are you sure you would like to delete your account?")) {
+    if (confirm("Are you sure you would like to delete your account? There is no un-doing this action!")) {
         client.delete('api/user/deleteUser', function (resp) {
             deleteStoredToken();
             window.location.assign("#!all");

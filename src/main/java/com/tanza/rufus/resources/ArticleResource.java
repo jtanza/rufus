@@ -15,7 +15,6 @@ import com.tanza.rufus.views.ArticleView;
 
 import io.dropwizard.auth.Auth;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,6 +28,6 @@ public interface UserDao {
     void addUser(@BindBean User user);
 
     @RegisterMapper(UserMapper.class)
-    @SqlUpdate("DELETE FROM rufususer WHERE email = :email")
+    @SqlUpdate("delete from rufususer where email = :email")
     void deleteUser(@Bind("email") String email);
 }
