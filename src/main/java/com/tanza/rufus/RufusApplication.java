@@ -8,9 +8,9 @@ import com.tanza.rufus.auth.TokenGenerator;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 import com.tanza.rufus.db.UserDao;
-import com.tanza.rufus.feed.FeedConstants;
 import com.tanza.rufus.feed.FeedParser;
 import com.tanza.rufus.feed.FeedProcessorImpl;
+import com.tanza.rufus.feed.FeedUtils;
 import com.tanza.rufus.resources.ArticleResource;
 import com.tanza.rufus.resources.UserResource;
 
@@ -33,8 +33,8 @@ import org.jose4j.keys.HmacKey;
 import org.skife.jdbi.v2.DBI;
 
 public class RufusApplication extends Application<RufusConfiguration> {
-    private static final byte[] VERIFICATION_KEY = System.getProperty(FeedConstants.JWT_PROPERTY).getBytes();
-    private static final String DB_SOURCE = "postgresql";
+    private static final byte[] VERIFICATION_KEY = FeedUtils.getVerificationKey();
+    private static final String DB_SOURCE = "h2";
     private static final String BEARER = "bearer";
     private static final String REALM = "realm";
     private static final String ROOT_PATH = "/api/*";

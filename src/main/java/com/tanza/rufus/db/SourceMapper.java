@@ -12,11 +12,9 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
-/**
- * Created by jtanza.
- */
 public class SourceMapper implements ResultSetMapper<Source> {
     @Override
     public Source map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
@@ -33,14 +31,11 @@ public class SourceMapper implements ResultSetMapper<Source> {
         }
 
         Array tags = resultSet.getArray("tags");
-        List<String> asList = null;
-        if (tags != null) {
-            asList = Arrays.asList((String[]) tags.getArray());
-        }
-
-        source.setTags(asList);
+        source.setTags(tags == null
+            ? Collections.emptyList()
+            : Arrays.asList((Object[]) tags.getArray()).stream().map(Object::toString).collect(Collectors.toList())
+        );
         source.setFrontpage(resultSet.getBoolean("frontpage"));
         return source;
     }
-
 }

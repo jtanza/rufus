@@ -45,6 +45,9 @@ public interface ArticleDao {
     @SqlUpdate("insert into sources(userid, source) values((select userid from rufususer where userid = :id), :source)")
     void addSource(@Bind("id") long id, @Bind("source") String source);
 
+    @SqlUpdate("insert into sources(userid, source, frontpage) values((select userid from rufususer where userid = :id), :source, true)")
+    void addFrontpageSource(@Bind("id") long id, @Bind("source") String source);
+
     @SqlUpdate("delete from sources where source = :source")
     void removeSource(@Bind("source") String source);
 

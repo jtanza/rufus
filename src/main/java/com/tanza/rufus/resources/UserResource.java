@@ -71,14 +71,15 @@ public class UserResource {
             return ResourceUtils.badRequest("A user with that email address already exists");
         }
 
-        User user = new User(email, AuthUtils.hashPassword(pw));
-        user = userDao.addUser(user);
+        userDao.addUser(new User(email, AuthUtils.hashPassword(pw)));
+        User user = userDao.findByEmail(email);
 
         List<String> starterFeeds = newUser.getStarterFeeds();
+        long userId = user.getId();
         if (CollectionUtils.isNotEmpty(starterFeeds) && UserUtils.validStarterFeeds(starterFeeds)) {
             for (String feed : starterFeeds) {
-                articleDao.addSource(
-                    user.getId(),
+                articleDao.addFrontpageSource(
+                    userId,
                     FeedConstants.STARTER_FEEDS.get(feed)
                 );
             }

@@ -81,5 +81,14 @@ public class FeedUtils {
         }
         return sources;
     }
+
+    public static byte[] getVerificationKey() {
+        String key = System.getenv(FeedConstants.JWT_PROPERTY);
+        if (key == null) {
+            throw new IllegalStateException("No JWT Environment Var Set!");
+        } else {
+            return key.getBytes();
+        }
+    }
 }
 

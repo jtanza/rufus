@@ -118,9 +118,10 @@ function genericErrorPage(errorResponse) {
             var login = getId("login");
             login.innerHTML = "Logout";
             login.removeAttribute("href");
+            //logout
             login.onclick = function() {
                 sessionStorage.removeItem("jwt_token");
-                window.location.reload();
+                window.location.href = '/#!all';
             };
         }
     });
