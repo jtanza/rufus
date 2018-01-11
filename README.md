@@ -7,23 +7,25 @@ Rufus is a free, open-source web based RSS reader. It can be built and managed l
 The project is packaged with Maven and is built as a fat jar. 
 Once the jar is built, it is possible to both initialize the database and start the HTTP server with the snapshot jar and the Dropwizard `db` and `server` commands. These steps are covered below. 
 
-Clone the repo.
+1) Clone the repo.
 
 `$ git clone https://github.com/jtanza/rufus.git && cd rufus`
+
+2) Set the JWT hash. 
 
 Rufus uses JWT for creating access tokens for user claims. The server key is read as an environment variable `(JWT_SECRET)` and must be set prior to server startup. For convenience, a hash can be generated with bash/md5 and set directly.
 
 `$ export JWT_SECRET=$(echo -n a_super_secret_password | md5)`
 
-Package the project.
+3) Package the project.
 
 `$ mvn package`
 
-Configure the h2 database.
+4) Configure the h2 database.
 
 `$ java -jar target/rufus-1.0-SNAPSHOT.jar db migrate config.yml`
 
-Start the server. 
+5) Start the server. 
 
 `$ java -jar target/rufus-1.0-SNAPSHOT.jar server config.yml`
 
@@ -38,7 +40,7 @@ Rufus leverages the [ROME](https://rometools.github.io/rome/) framework to parse
 
 The application operates on both anonymous and authenticated user sessions. Anonymous sessions return data from a predefined collection of 'public' RSS feeds. 
 
-Syndication feeds (`Source`s internally) are displayed as `Article`s on the frontend. After initial load, articles are cached internally with a short TTL as a trade-off on application speed/ real-time source updates. All user facing article functionality is grouped within the `ArticleResource` and exposed through requests at `/api/articles/*` 
+Syndication feeds (`Source`s internally) are displayed as `Article`s on the frontend. After initial load, articles are cached internally with a short TTL as a trade-off on application speed/ real-time source updates. Most all feed processing logic (download, parsing, aggregation etc.) is contained within the [FeedProcessor](/src/main/java/com/tanza/rufus/feed/FeedProcessorImpl.java). All user facing article functionality is grouped within the [ArticleResource](/src/main/java/com/tanza/rufus/resources/ArticleResource.java) and exposed through requests at `/api/articles/*`
 
 Also, please note that this project is still under development and as such much functionality may be currently broken/ missing. Below there is a small list of todo items I plan on implementing as quickly as possible (:
 
@@ -120,7 +122,7 @@ Content-Length: 6503
 ```
 
 ### Todos
-* HTTPS.
+* HTTPS on the public instance.
 * OPML import/export.
 * Pagination of endpoints returning article collections.
 * Cache investigation, i.e. is non real-time article feed updates preferable?
