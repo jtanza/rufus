@@ -1,7 +1,9 @@
 package com.tanza.rufus;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.google.common.cache.CacheBuilderSpec;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 

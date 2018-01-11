@@ -1,13 +1,16 @@
 package com.tanza.rufus.feed;
 
-import com.sun.syndication.feed.synd.SyndEntry;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.RufusFeed;
 import com.tanza.rufus.api.Source;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.jsoup.Jsoup;
+
+import com.sun.syndication.feed.synd.SyndEntry;
 
 import java.net.MalformedURLException;
 import java.net.URL;

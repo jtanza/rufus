@@ -1,12 +1,12 @@
 package com.tanza.rufus.api;
 
-import com.sun.syndication.feed.synd.SyndFeed;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.SourceMapper;
 import com.tanza.rufus.feed.FeedUtils;
 
+import com.sun.syndication.feed.synd.SyndFeed;
+
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;

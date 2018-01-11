@@ -1,9 +1,10 @@
 package com.tanza.rufus.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.tanza.rufus.feed.FeedProcessorImpl;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

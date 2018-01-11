@@ -1,6 +1,10 @@
 package com.tanza.rufus.feed;
 
-import com.tanza.rufus.api.*;
+import com.tanza.rufus.api.Article;
+import com.tanza.rufus.api.Channel;
+import com.tanza.rufus.api.Document;
+import com.tanza.rufus.api.RufusFeed;
+import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
 import com.tanza.rufus.db.ArticleDao;
 
@@ -20,9 +24,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.tanza.rufus.feed.FeedConstants.PUB_USER_KEY;

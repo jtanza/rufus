@@ -1,6 +1,7 @@
 package com.tanza.rufus.auth;
 
 import com.tanza.rufus.core.User;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 /**

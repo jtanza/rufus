@@ -1,6 +1,7 @@
 package com.tanza.rufus.views;
 
 import com.tanza.rufus.api.Article;
+
 import io.dropwizard.views.View;
 
 import java.util.Collection;

@@ -1,9 +1,10 @@
 package com.tanza.rufus.feed;
 
-import com.google.common.cache.LoadingCache;
 import com.tanza.rufus.api.Article;
 import com.tanza.rufus.api.Source;
 import com.tanza.rufus.core.User;
+
+import com.google.common.cache.LoadingCache;
 
 import java.util.List;
 

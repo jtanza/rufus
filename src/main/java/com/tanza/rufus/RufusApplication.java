@@ -1,7 +1,5 @@
 package com.tanza.rufus;
 
-import com.github.toastshaman.dropwizard.auth.jwt.CachingJwtAuthenticator;
-import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import com.tanza.rufus.auth.BasicAuthenticator;
 import com.tanza.rufus.auth.JwtAuthenticator;
 import com.tanza.rufus.auth.TokenGenerator;
@@ -24,12 +22,15 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-
 import io.dropwizard.views.ViewBundle;
+
+import com.github.toastshaman.dropwizard.auth.jwt.CachingJwtAuthenticator;
+import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.HmacKey;
+
 import org.skife.jdbi.v2.DBI;
 
 public class RufusApplication extends Application<RufusConfiguration> {

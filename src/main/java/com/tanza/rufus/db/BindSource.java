@@ -11,15 +11,11 @@ import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Types;
 
-/**
- * Created by jtanza.
- */
 @BindingAnnotation(BindSource.SourceBinderFactory.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
 public @interface BindSource {
     class SourceBinderFactory implements BinderFactory {
-
         @Override
         public Binder build(Annotation annotation) {
             return (Binder<BindSource, Source>) (sql, bindSource, source) -> {
