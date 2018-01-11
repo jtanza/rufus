@@ -1,6 +1,6 @@
 ## Rufus
 
-Rufus is a free, open-source web based RSS reader. It can be built and managed locally following the instructions below, or accessed at the [public instance](http://rufus.news/). Rufus is written in Java atop [Dropwizard](http://www.dropwizard.io/). The frontend is vanilla javascript, with the help of [Navigo](https://github.com/krasimir/navigo) and [Mustache](https://mustache.github.io/).
+Rufus is a free, open-source web based RSS reader, designed to be both simple and fast. It can be built and managed locally following the instructions below, or accessed at the [public instance](http://rufus.news/). Rufus is written in Java atop [Dropwizard](http://www.dropwizard.io/). The frontend is vanilla javascript, with the help of [Mustache](https://mustache.github.io/) [and](https://github.com/krasimir/navigo) [others](http://getskeleton.com/).
 
 ### Building
 
@@ -21,7 +21,7 @@ Rufus uses JWT for creating access tokens for user claims. The server key is rea
 
 `$ mvn package`
 
-4) Configure the h2 database.
+4) Configure the H2 database.
 
 `$ java -jar target/rufus-1.0-SNAPSHOT.jar db migrate config.yml`
 
@@ -29,9 +29,9 @@ Rufus uses JWT for creating access tokens for user claims. The server key is rea
 
 `$ java -jar target/rufus-1.0-SNAPSHOT.jar server config.yml`
 
-Once the application is up it will be listening on port `8080` and can be accessed in the browser at `localhost:8080`.
-
 Et voila, you're done, enjoy!
+
+(Once the application is up it will be listening on port `8080` and can be accessed in the browser at `localhost:8080`.)
 
 P.S. On all subsequent launches (barring any including database migrations) it is simply enough to run the `./launch` script to start the application.
 
