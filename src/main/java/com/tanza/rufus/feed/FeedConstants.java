@@ -10,7 +10,7 @@ public final class FeedConstants {
     public static final ImmutableMap<String, String> STARTER_FEEDS =
         new ImmutableMap.Builder<String, String>()
             .put("ny_times_world", "http://rss.nytimes.com/services/xml/rss/nyt/World.xml")
-            .put("washington_post_politics", "http://feeds.washingtonpost.com/rss/politics")
+            .put("slash_dot", "http://rss.slashdot.org/Slashdot/slashdot")
             .put("wired", "https://www.wired.com/feed/rss")
             .put("scientific_american", "http://rss.sciam.com/ScientificAmerican-News")
             .build();
