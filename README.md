@@ -1,4 +1,4 @@
-## Rufus
+# Rufus
 
 Rufus is a free, open-source web based RSS reader, designed to be both simple and fast. It can be built and managed locally following the instructions below, or accessed at the [public instance](http://rufus.news/). Rufus is written in Java atop [Dropwizard](http://www.dropwizard.io/). The frontend is vanilla javascript, with the help of [Mustache](https://mustache.github.io/) [and](https://github.com/krasimir/navigo) [others](http://getskeleton.com/).
 
