@@ -7,9 +7,6 @@ Rufus is a free, open-source web based RSS reader. It can be built and managed l
 The project is packaged with Maven and is built as a fat jar. 
 Once the jar is built, it is possible to run the application as an HTTP server with the snapshot jar and the Dropwizard `server` command. The server command will read the supplied YAML config file and start the application. 
 
-##### Requirements
-maven, git, java8+
-
 Clone the repo.
 
 `$ git clone https://github.com/jtanza/rufus.git && cd rufus`
@@ -43,7 +40,7 @@ The application operates on both anonymous and authenticated user sessions. Anon
 
 Syndication feeds (`Source`s internally) are displayed as `Article`s on the frontend. After initial load, articles are cached internally with a short TTL as a trade-off on application speed/ real-time source updates. All user facing article functionality is grouped within the `ArticleResource` and exposed through requests at `/api/articles/*` 
 
-                                                                                                                                                                                                                                                                                                                                                       Also, please note that this project is still under development and as such much functionality may be currently broken/ missing. Below there is a small list of todo items I plan on implementing as quickly as possible (:
+Also, please note that this project is still under development and as such much functionality may be currently broken/ missing. Below there is a small list of todo items I plan on implementing as quickly as possible (:
 
 ### Database
 
@@ -98,20 +95,19 @@ Content-Type: text/html
 Vary: Accept-Encoding
 Transfer-Encoding: chunked
 
-    <div class="eight columns" id=https://www.wired.com/story/most-read-wired-business-stories-2017>
-            <div class="article-content">
-                        <div class="title">
-                                        <h6><a href=https://www.wired.com/story/most-read-wired-business-stories-2017>WIRED Business Stories of 2017</a></h6>
-                                                    </div>
-                                                                <div class="description">
-                                                                                <p>The future of jobs weighed heavy on everyone&#39;s minds</p>
-                                                                                            </div>
-                                                                                                    </div>
-                                                                                                        </div>
-                                                                                                        ```
-
-                                                                                                        as JSON
-                                                                                                        ```
+<div class="eight columns" id=https://www.wired.com/story/most-read-wired-business-stories-2017>
+   <div class="article-content">
+      <div class="title">
+         <h6><a href=https://www.wired.com/story/most-read-wired-business-stories-2017>WIRED Business Stories of 2017</a></h6>
+      </div>
+      <div class="description">
+         <p>The future of jobs weighed heavy on everyone&#39;s minds</p>
+      </div>
+   </div>
+</div>
+```
+as JSON
+```
 $ curl -i -H "Accept: application/json" http://localhost:8080/api/articles/frontpage
 
 HTTP/1.1 200 OK
@@ -121,25 +117,25 @@ Vary: Accept-Encoding
 Content-Length: 6503
 
 {"articles":[{"title":"The Most-read WIRED Business Stories of 2017","publicationDate":"15:00 PM UTC - 12/27/2017","authors":["Andrea Valdez"],"description":"The future of jobs weighed heavy on everyone's minds.","url":"https://www.wired.com/story/most-read-wired-business-stories-2017","channelTitle":"Wired","channelUrl":"https://www.wired.com","bookmark":false}, ...
-  ```
+```
 
 ### Todos
-    * HTTPS.
-    * OPML import/export.
-    * Pagination of endpoints returning article collections.
-    * Cache investigation, i.e. is non real-time article feed updates preferable?
-    * Add "bookmarking" functionality on frontend. Endpoints and data services are complete on the backend, but lack the frontend access.
-    * Add options to add and view collection tags on the frontend. Again, endpoints and data services for the functionality is complete on the backend yet lack the client integration. 
-    * User management
-      * password recovery.
-        * username updates.
-          * etc.
-          * Make things generally _better_ on the frontend. I am unfortunately not a frontend developer and may have leveraged one or more js hacks than is generally advisable. (:  
+* HTTPS.
+* OPML import/export.
+* Pagination of endpoints returning article collections.
+* Cache investigation, i.e. is non real-time article feed updates preferable?
+* Add "bookmarking" functionality on frontend. Endpoints and data services are complete on the backend, but lack the frontend access.
+* Add options to add and view collection tags on the frontend. Again, endpoints and data services for the functionality is complete on the backend yet lack the client integration. 
+* User management
+  * password recovery.
+  * username updates.
+  * etc.
+  * Make things generally _better_ on the frontend. I am unfortunately not a frontend developer and may have leveraged one or more js hacks than is generally advisable (:
 
 ### Bugs/ Contributing
-              Contributions are welcome, and would be greatly appreciated on the frontend side of things! (refer to the todos above if looking for something to tackle).
+Contributions are welcome, and would be greatly appreciated on the frontend side of things! (refer to the todos above if looking for something to tackle).
 
-              Feel free to shoot me an email about any questions or bugs that you come across @ tanzajohn@gmail.com
+Feel free to shoot me an email about any questions or bugs that you come across @ tanzajohn@gmail.com
 
 ### License
-              Rufus is [MIT](https://github.com/jtanza/rufus/blob/master/LICENSE.txt) licensed.
+Rufus is [MIT](https://github.com/jtanza/rufus/blob/master/LICENSE.txt) licensed.
