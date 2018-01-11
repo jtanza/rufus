@@ -35,7 +35,7 @@ Et voila, you're done, enjoy!
 
 P.S. On all subsequent launches (barring any including database migrations) it is simply enough to run the `./launch` script to start the application.
 
-#### Overview & Getting Started
+### Overview & Getting Started
 Rufus leverages the [ROME](https://rometools.github.io/rome/) framework to parse user's syndication feeds for use throughout the rest of the application.
 
 The application operates on both anonymous and authenticated user sessions. Anonymous sessions return data from a predefined collection of 'public' RSS feeds. 
