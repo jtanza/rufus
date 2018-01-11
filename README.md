@@ -132,7 +132,7 @@ Content-Length: 6503
   * password recovery.
   * username updates.
   * etc.
-  * Make things generally _better_ on the frontend. I am unfortunately not a frontend developer and may have leveraged one or more js hacks than is generally advisable (:
+* Make things generally _better_ on the frontend. I am unfortunately not a frontend developer and may have leveraged one or more js hacks than is generally advisable (:
 
 ### Bugs/ Contributing
 Contributions are welcome, and would be greatly appreciated on the frontend side of things! (refer to the todos above if looking for something to tackle).
