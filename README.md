@@ -5,7 +5,7 @@ Rufus is a free, open-source web based RSS reader. It can be built and managed l
 ### Building
 
 The project is packaged with Maven and is built as a fat jar. 
-Once the jar is built, it is possible to run the application as an HTTP server with the snapshot jar and the Dropwizard `server` command. The server command will read the supplied YAML config file and start the application. 
+Once the jar is built, it is possible to both initialize the database and start the HTTP server with the snapshot jar and the Dropwizard `db` and `server` commands. These steps are covered below. 
 
 Clone the repo.
 
