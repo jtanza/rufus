@@ -4,12 +4,13 @@ import com.stripe.model.Charge;
 import com.stripe.net.RequestOptions;
 import com.tanza.rufus.core.User;;
 
-public enum SubscriptionPlans {
-    INDIE,
-    SMALLPRESS, 
-    CONGLOMERATE
-}
 
 public class StripeSubscription {
-    public StripeSubscription(String apiKey, String email, SubscriptionPlans plan, User user){}
+
+    private enum SubscriptionPlan {
+        INDIE,
+        SMALLPRESS, 
+        CONGLOMERATE
+    }
+    public StripeSubscription(String apiKey, String email, SubscriptionPlan plan, User user){}
 }
