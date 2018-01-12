@@ -1,0 +1,83 @@
+
+<form id="registrationForm" onkeypress="return searchKeyPress(event);">
+    <div class="row">
+        <div class="ten columns">
+            <h3>Register</h3>
+        </div>
+    </div>
+
+    <div class="register_form">
+        <div class="row">
+            <div class="three columns">
+                <label for="emailInput">Your email</label>
+                <input class="u-full-width" type="email" placeholder="rufus@mailbox.com" id="emailInput">
+            </div>
+            <div class="three columns">
+                <label for="passwordInput">Your password</label>
+                <input class="u-full-width" type="password" placeholder="super_secret" id="passwordInput">
+            </div>
+        </div>
+    </div>
+    <div class="ten columns">
+        <p>
+            Rufus can read and aggregate any valid RSS/ATOM web feeds. After you register you'll have the option to add as many sources as you'd like. Below are some recommended subscription feeds to get you started.
+        </p>
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Subscribe</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>New York Times - World</td>
+                <td>World News</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="ny_times_world">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Wired</td>
+                <td>Technology</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="wired">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Slashdot</td>
+                <td>Technology</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="slash_dot">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Scientific American</td>
+                <td>Science</td>
+                <td>
+                    <label class="example-send-yourself-copy">
+                        <input type="checkbox" id="scientific_american">
+                        <span class="label-body"></span>
+                    </label>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="six columns">
+        <input class="button-primary" id="btnSearch" onclick="registerUser()" type="button" value="Submit">
+        <p>
+            <span class="nowrap"><a href="#!login">Already have an account? Login!</a></span>
+        </p>
+    </div>
+</form>
