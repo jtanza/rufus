@@ -1,6 +1,6 @@
 # Rufus
 
-Rufus is a free, open-source web based RSS reader, designed to be both simple and fast. It can be built and managed locally following the instructions below, or accessed at the [public instance](http://rufus.news/). Rufus is written in Java atop [Dropwizard](http://www.dropwizard.io/). The frontend is vanilla javascript, with the help of [Mustache](https://mustache.github.io/) [and](https://github.com/krasimir/navigo) [others](http://getskeleton.com/).
+Rufus is a free, open-source web based RSS reader, designed to be both simple and fast. It can be built and managed locally following the instructions below, or accessed at the [public instance](http://rufus.news/). Rufus is written in Java atop [Dropwizard](http://www.dropwizard.io/). The frontend is vanilla javascript, with the help of [Mustache](https://mustache.github.io/) [and others](/src/main/resources/app/dependencies).
 
 ### Building
 
@@ -132,6 +132,7 @@ Content-Length: 6503
   * password recovery.
   * username updates.
   * etc.
+* [Mark articles as read.](https://github.com/jtanza/rufus/issues/2)
 * Make things generally _better_ on the frontend. I am unfortunately not a frontend developer and may have leveraged one or more js hacks than is generally advisable (:
 
 ### Bugs/ Contributing
