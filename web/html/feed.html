@@ -1,0 +1,17 @@
+<html>
+  <h1>Hi</h1>
+  <body>
+    {{range .}}
+      <ul>
+        <li>
+          <h4>{{.Title}}</h4>
+          <p>{{.Link}}</p>
+          <!--<p>Content: {{.Content}}</p>-->
+          <p>Description: {{.Description}}</p>
+          <p>Authors: {{.Authors}}</p>
+          <p>{{.Published}}</p>
+        </li>
+      </ul>
+    {{end}}
+  </body>
+</html>
