@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"log"
 	"net/http"
 
@@ -9,17 +8,12 @@ import (
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("./web/html")))
+	store, err := internal.NewStore()
+	if err != nil {
+		log.Fatal(err)
+	}
+	go store.ExpireStore()
 
-	http.HandleFunc("/feed", func(rw http.ResponseWriter, r *http.Request) {
-		articles := make([]internal.Article, 0)
-		for _, feed := range internal.Feeds() {
-			articles = append(articles, internal.Articles(feed)...)
-		}
-
-		t, _ := template.ParseFiles("web/html/feed.html")
-		t.Execute(rw, articles)
-	})
-
+	internal.Routes(store)
 	log.Fatal(http.ListenAndServe(":3333", nil))
 }

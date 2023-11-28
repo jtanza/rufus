@@ -3,6 +3,7 @@ module github.com/jtanza/rufus
 go 1.21
 
 require (
+	github.com/google/uuid v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.18
 	github.com/mmcdole/gofeed v1.2.1
 )

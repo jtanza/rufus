@@ -2,37 +2,13 @@ package internal
 
 import (
 	"log"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/mmcdole/gofeed"
 )
 
-type Feed struct {
-	Title       string `json:"title,omitempty"`
-	Description string `json:"description,omitempty"`
-	Link        string `json:"link,omitempty"`
-}
-
-type Article struct {
-	FeedTitle   string   `json:"feedtitle,omitempty"`
-	FeedLink    string   `json:"feedlink,omitempty"`
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Content     string   `json:"content,omitempty"`
-	Link        string   `json:"link,omitempty"`
-	Published   string   `json:"published,omitempty"`
-	Authors     []string `json:"authors,omitempty"`
-}
-
-func ParseFeed(url string) *gofeed.Feed {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return feed
-}
-
-func Articles(feedUrl string) []Article {
+func FeedArticles(feedUrl string) []Article {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(feedUrl)
 	if err != nil {
@@ -41,7 +17,8 @@ func Articles(feedUrl string) []Article {
 
 	articles := make([]Article, 0)
 	for _, item := range feed.Items {
-		articles = append(articles, Article{
+		article := Article{
+			uuid.New().String(),
 			feed.Title,
 			feed.Link,
 			item.Title,
@@ -50,16 +27,24 @@ func Articles(feedUrl string) []Article {
 			item.Link,
 			item.Published,
 			authors(item.Authors),
-		})
+		}
+		formatContent(&article)
+		articles = append(articles, article)
 	}
 
 	return articles
 }
 
-func authors(people []*gofeed.Person) []string {
-	authors := make([]string, 2)
+func authors(people []*gofeed.Person) string {
+	authors := make([]string, 0)
 	for _, person := range people {
 		authors = append(authors, person.Name)
 	}
-	return authors
+	return strings.Join(authors, ",")
+}
+
+func formatContent(article *Article) {
+	if len(article.Content) == 0 {
+		article.Content = article.Description
+	}
 }
