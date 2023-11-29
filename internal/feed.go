@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -14,6 +15,8 @@ func FeedArticles(feedUrl string) []Article {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(feed)
 
 	articles := make([]Article, 0)
 	for _, item := range feed.Items {

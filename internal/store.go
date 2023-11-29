@@ -14,11 +14,14 @@ type Store struct {
 }
 
 type Feed struct {
-	Id        int
-	UUID      string
-	Title     string
-	Link      string
-	Frontpage bool
+	Id          int
+	UUID        string
+	Title       string
+	SiteLink    string
+	FeedLink    string
+	Description string
+	FeedType    string
+	Frontpage   bool
 }
 
 type Article struct {
@@ -39,7 +42,7 @@ func NewStore() (Store, error) {
 }
 
 func (store *Store) FrontPageFeeds() []Feed {
-	rows, err := store.db.Query("select id, uuid, title, link, frontpage from feed where frontpage = 1")
+	rows, err := store.db.Query("select id, uuid, title, sitelink, feedlink, description, feedtype, frontpage from feed where frontpage = 1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +51,7 @@ func (store *Store) FrontPageFeeds() []Feed {
 }
 
 func (store *Store) Feeds() []Feed {
-	rows, err := store.db.Query("select id, uuid, title, link, frontpage from feed")
+	rows, err := store.db.Query("select id, uuid, title, sitelink, feedlink, description, feedtype, frontpage from feed")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +65,7 @@ func (store *Store) CachedArticles(feeds []Feed) map[int][]Article {
 		articles := store.articlesFromCache(feed.Id)
 		if len(articles) == 0 {
 			log.Printf("Cache miss for feed %v, fetching articles from source", feed.Id)
-			articles = FeedArticles(feed.Link)
+			articles = FeedArticles(feed.FeedLink)
 			err := store.saveToCache(feed.Id, articles)
 			if err != nil {
 				log.Fatal(err)
@@ -101,11 +104,12 @@ func (store *Store) ExpireStore() {
 	}
 }
 
+// select needs to be same order as struct fields
 func feedsFromQuery(rows *sql.Rows) []Feed {
 	feeds := make([]Feed, 0)
 	for rows.Next() {
 		var feed Feed
-		if err := rows.Scan(&feed.Id, &feed.UUID, &feed.Title, &feed.Link, &feed.Frontpage); err != nil {
+		if err := rows.Scan(&feed.Id, &feed.UUID, &feed.Title, &feed.SiteLink, &feed.FeedLink, &feed.Description, &feed.FeedType, &feed.Frontpage); err != nil {
 			log.Fatal(err)
 		}
 		feeds = append(feeds, feed)
@@ -128,7 +132,7 @@ func articlesFromQuery(rows *sql.Rows) []Article {
 
 func (store *Store) articlesFromCache(feedId int) []Article {
 	rows, err := store.db.Query(
-		"select a.uuid, a.link, a.title, a.description, a.content, a.published, a.authors, f.title, f.link "+
+		"select a.uuid, a.link, a.title, a.description, a.content, a.published, a.authors, f.title, f.feedlink "+
 			"from article a join feed f on a.feedid = f.id "+
 			"where a.expiration > (unixepoch('now')) and f.id = ?", feedId)
 	if err != nil {

@@ -1,0 +1,16 @@
+<html>
+  <h1>Feeds</h1>
+  <body>
+    {{range .}}
+      <ul>
+        <li>
+          <p>{{.Title}}</p>
+          <p>{{.Description}}</p>
+          <p>{{.SiteLink}}</p>
+          <p>{{.FeedLink}}</p>
+          <p>{{.FeedType}}</p>
+        </li>
+      </ul>
+    {{end}}
+  </body>
+</html>

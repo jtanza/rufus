@@ -9,7 +9,7 @@ import (
 func Routes(store Store) {
 	http.Handle("/", http.FileServer(http.Dir("web/html")))
 
-	http.HandleFunc("/feed", func(rw http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/frontpage", func(w http.ResponseWriter, r *http.Request) {
 		feeds := store.FrontPageFeeds()
 		cached := store.CachedArticles(feeds)
 
@@ -19,7 +19,7 @@ func Routes(store Store) {
 		}
 
 		t, _ := template.ParseFiles("web/html/feed.html")
-		t.Execute(rw, articles)
+		t.Execute(w, articles)
 	})
 
 	http.HandleFunc("/article/", func(w http.ResponseWriter, r *http.Request) {
@@ -33,5 +33,12 @@ func Routes(store Store) {
 
 		t, _ := template.ParseFiles("web/html/article.html")
 		t.Execute(w, article)
+	})
+
+	http.HandleFunc("/feeds", func(w http.ResponseWriter, r *http.Request) {
+		feeds := store.Feeds()
+
+		t, _ := template.ParseFiles("web/html/feeds.html")
+		t.Execute(w, feeds)
 	})
 }
